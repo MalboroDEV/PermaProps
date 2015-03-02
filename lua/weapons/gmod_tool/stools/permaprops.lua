@@ -55,10 +55,14 @@ local function RebuildOldTable( data )
 	new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
 	new_ent.PermaProps = true
 	new_ent:SetRenderMode( RENDERMODE_TRANSALPHA )
-	new_ent:SetMoveType(0)
+	--new_ent:SetMoveType(0)
+
+	local phys = new_ent:GetPhysicsObject()
+	if phys and phys:IsValid() then
+		phys:EnableMotion(false)
+	end
 
 	sql.Query("INSERT INTO permaprops (id, map, content) VALUES(NULL, ".. sql.SQLStr(game.GetMap()) ..", ".. sql.SQLStr(util.TableToJSON(content)) ..");")
-
 
 end
 
@@ -95,7 +99,7 @@ function ReloadPermaProps()
 			local e = duplicator.CreateEntityFromTable(nil, data)
 			if !e or !e:IsValid() then continue end
 			e:SetRenderMode( RENDERMODE_TRANSALPHA )
-			e:SetMoveType(0)
+			--e:SetMoveType(0)
 			e.PermaProps = true
 			e.ID = v.id
 
@@ -113,7 +117,7 @@ hook.Add("InitPostEntity", "InitializePermaProps", ReloadPermaProps)
 
 function TOOL:LeftClick(trace)
 
-	if (CLIENT) then return end
+	if CLIENT then return end
 
 	if not trace.Entity:IsValid() or not self:GetOwner():IsAdmin() then return end
 
@@ -134,7 +138,12 @@ function TOOL:LeftClick(trace)
 	new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
 	new_ent.PermaProps = true
 	new_ent:SetRenderMode( RENDERMODE_TRANSALPHA )
-	new_ent:SetMoveType(0)
+	--new_ent:SetMoveType(0)
+
+	local phys = new_ent:GetPhysicsObject()
+	if phys and phys:IsValid() then
+		phys:EnableMotion(false)
+	end
 
 	local effectdata = EffectData()
 	effectdata:SetOrigin(ent:GetPos())
@@ -152,7 +161,7 @@ end
 
 function TOOL:RightClick(trace)
 
-	if (CLIENT) then return end
+	if CLIENT then return end
 
 	if (not trace.Entity:IsValid()) then return end
 
@@ -177,7 +186,7 @@ end
 
 function TOOL:Reload(trace)
 
-	if (CLIENT) then return end
+	if CLIENT then return end
 
 	if (not trace.Entity:IsValid()) then self:GetOwner():ChatPrint( "You have reload all PermaProps !" ) ReloadPermaProps() return false end
 
@@ -197,7 +206,12 @@ function TOOL:Reload(trace)
 		new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
 		new_ent.PermaProps = true
 		new_ent:SetRenderMode( RENDERMODE_TRANSALPHA )
-		new_ent:SetMoveType(0)
+		--new_ent:SetMoveType(0)
+
+		local phys = new_ent:GetPhysicsObject()
+		if phys and phys:IsValid() then
+			phys:EnableMotion(false)
+		end
 
 		ent:Remove()
 
