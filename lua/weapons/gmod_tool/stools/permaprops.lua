@@ -52,6 +52,7 @@ local function RebuildOldTable( data )
 	e:Remove()
 
 	local new_ent = duplicator.CreateEntityFromTable(nil, content)
+	if !new_ent or !new_ent:IsValid() then return end
 	new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
 	new_ent.PermaProps = true
 	new_ent:SetRenderMode( RENDERMODE_TRANSALPHA )
@@ -135,6 +136,7 @@ function TOOL:LeftClick(trace)
 	ent:Remove()
 
 	local new_ent = duplicator.CreateEntityFromTable(nil, content)
+	if !new_ent or !new_ent:IsValid() then return end
 	new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
 	new_ent.PermaProps = true
 	new_ent:SetRenderMode( RENDERMODE_TRANSALPHA )
@@ -203,6 +205,7 @@ function TOOL:Reload(trace)
 		content.ConstraintSystem = {} -- No Constraints :)
 
 		local new_ent = duplicator.CreateEntityFromTable(nil, content)
+		if !new_ent or !new_ent:IsValid() then return end
 		new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
 		new_ent.PermaProps = true
 		new_ent:SetRenderMode( RENDERMODE_TRANSALPHA )
