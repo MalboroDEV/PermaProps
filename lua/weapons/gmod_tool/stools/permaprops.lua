@@ -14,23 +14,27 @@
 		By Malboro the 28/12/2012
 */
 
-sql.Query("CREATE TABLE IF NOT EXISTS permaprops('id' INTEGER NOT NULL, 'map' TEXT NOT NULL, 'content' TEXT NOT NULL, PRIMARY KEY('id'));")
-
-CreateConVar( "pp_phys_admin", 0, { FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE }, "Admin can touch permaprops" )
-CreateConVar( "pp_phys_sadmin", 1, { FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE }, "Only Super Admin can touch permaprops" )
-
 TOOL.Category		=	"SaveProps"
 TOOL.Name			=	"PermaProps"
 TOOL.Command		=	nil
 TOOL.ConfigName		=	""
 
-if(CLIENT)then
+if CLIENT then
 	language.Add("Tool.permaprops.name", "PermaProps")
 	language.Add("Tool.permaprops.desc", "Save a props permanently")
 	language.Add("Tool.permaprops.0", "LeftClick: Add RightClick: Remove Reload: Update")
 end
 
+if SERVER then
+	sql.Query("CREATE TABLE IF NOT EXISTS permaprops('id' INTEGER NOT NULL, 'map' TEXT NOT NULL, 'content' TEXT NOT NULL, PRIMARY KEY('id'));")
+	CreateConVar( "pp_phys_admin", 0, { FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE }, "Admin can touch permaprops" )
+	CreateConVar( "pp_phys_sadmin", 1, { FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE }, "Only Super Admin can touch permaprops" )
+	CreateConVar( "pp_freeze", 1, { FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE }, "Free all permaprops on spawn" )
+end
+
 local function RebuildOldTable( data )
+
+	if CLIENT then return end
 
 	local e = ents.Create( data.class )
 	if !e or !e:IsValid() then return end
@@ -53,10 +57,10 @@ local function RebuildOldTable( data )
 
 	local new_ent = duplicator.CreateEntityFromTable(nil, content)
 	if !new_ent or !new_ent:IsValid() then return end
+	new_ent["EntityMods"] = content["EntityMods"]
+	duplicator.ApplyEntityModifiers( nil, new_ent )
 	new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
 	new_ent.PermaProps = true
-	new_ent:SetRenderMode( RENDERMODE_TRANSALPHA )
-	--new_ent:SetMoveType(0)
 
 	local phys = new_ent:GetPhysicsObject()
 	if phys and phys:IsValid() then
@@ -68,6 +72,8 @@ local function RebuildOldTable( data )
 end
 
 function ReloadPermaProps()
+
+	if CLIENT then return end
 	
 	for k, v in pairs( ents.GetAll() ) do
 
@@ -79,7 +85,7 @@ function ReloadPermaProps()
 
 	end
 
-	local content = sql.Query( "SELECT * FROM permaprops" )
+	local content = sql.Query( "SELECT * FROM permaprops;" )
 
 	if content == nil then return end
 	
@@ -88,6 +94,7 @@ function ReloadPermaProps()
 		if game.GetMap() == v.map then
 
 			local data = util.JSONToTable(v.content)
+
 
 			if data.pos != nil then
 				
@@ -99,8 +106,8 @@ function ReloadPermaProps()
 
 			local e = duplicator.CreateEntityFromTable(nil, data)
 			if !e or !e:IsValid() then continue end
-			e:SetRenderMode( RENDERMODE_TRANSALPHA )
-			--e:SetMoveType(0)
+			e["EntityMods"] = data["EntityMods"]
+			duplicator.ApplyEntityModifiers( nil, e )
 			e.PermaProps = true
 			e.ID = v.id
 
@@ -108,6 +115,18 @@ function ReloadPermaProps()
 			if phys and phys:IsValid() then
 				phys:EnableMotion(false)
 			end
+
+			/*if (GetConVarNumber("pp_freeze") or 0) == 1 then -- DEVVV
+				local phys = e:GetPhysicsObject()
+				if phys and phys:IsValid() then
+					phys:EnableMotion(false)
+				end
+			else
+				local phys = e:GetPhysicsObject()
+				if phys and phys:IsValid() then
+					phys:EnableMotion(true)
+				end
+			end*/
 
 		end
 
@@ -137,10 +156,10 @@ function TOOL:LeftClick(trace)
 
 	local new_ent = duplicator.CreateEntityFromTable(nil, content)
 	if !new_ent or !new_ent:IsValid() then return end
+	new_ent["EntityMods"] = content["EntityMods"]
+	duplicator.ApplyEntityModifiers( nil, new_ent )
 	new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
 	new_ent.PermaProps = true
-	new_ent:SetRenderMode( RENDERMODE_TRANSALPHA )
-	--new_ent:SetMoveType(0)
 
 	local phys = new_ent:GetPhysicsObject()
 	if phys and phys:IsValid() then
@@ -204,12 +223,14 @@ function TOOL:Reload(trace)
 		content.Constraints = {} -- No Constraints :)
 		content.ConstraintSystem = {} -- No Constraints :)
 
+		sql.Query("UPDATE permaprops set content = ".. sql.SQLStr(util.TableToJSON(content)) .." WHERE id = ".. ent.ID .." AND map = ".. sql.SQLStr(game.GetMap()) .. ";")
+
 		local new_ent = duplicator.CreateEntityFromTable(nil, content)
 		if !new_ent or !new_ent:IsValid() then return end
+		new_ent["EntityMods"] = content["EntityMods"]
+		duplicator.ApplyEntityModifiers( nil, new_ent )
 		new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
 		new_ent.PermaProps = true
-		new_ent:SetRenderMode( RENDERMODE_TRANSALPHA )
-		--new_ent:SetMoveType(0)
 
 		local phys = new_ent:GetPhysicsObject()
 		if phys and phys:IsValid() then
@@ -225,7 +246,6 @@ function TOOL:Reload(trace)
 		effectdata:SetRadius(3)
 		util.Effect("Sparks", effectdata)
 
-		sql.Query("UPDATE permaprops set content = ".. sql.SQLStr(util.TableToJSON(content)) .." WHERE id = ".. ent.ID .." AND map = ".. sql.SQLStr(game.GetMap()) .. ";")
 		ply:ChatPrint("You updated the " .. ent:GetClass() .. " you selected in the database.")
 
 
@@ -245,6 +265,7 @@ function TOOL.BuildCPanel(panel)
 	panel:AddControl("Label",{Text = "------ Configuration ------"})
 	panel:AddControl("Button",{Label = "Admin can touch PermaProps", Command = "pp_phys_change_admin"})
 	panel:AddControl("Button",{Label = "SuperAdmin can touch PermaProps", Command = "pp_phys_change_sadmin"})
+	--panel:AddControl("Button",{Label = "Freeze all PermaProps", Command = "pp_change_freeze"})
 	panel:AddControl("Label",{Text = "-------- Functions --------"})
 	panel:AddControl("Button", {Text = "Remove all PermaProps", Command = "perma_remove_all"})
 
@@ -302,6 +323,26 @@ local function pp_phys_change_sadmin( ply ) -- Shit but work !!
 
 end
 concommand.Add("pp_phys_change_sadmin", pp_phys_change_sadmin)
+
+/*local function pp_change_freeze( ply ) -- Shit but work !!
+
+	if CLIENT then return end
+
+	if not ply:IsSuperAdmin() then return end
+
+	local Value = (GetConVarNumber("pp_freeze") or 0)
+
+	if Value == 1 then
+		game.ConsoleCommand("pp_freeze 0\n")
+		ply:ChatPrint("All permaprops spawn unfrozen !")
+	elseif Value == 0 then
+		game.ConsoleCommand("pp_freeze 1\n")
+		ply:ChatPrint("All permaprops spawn frozen !")
+	end
+
+end
+concommand.Add("pp_change_freeze", pp_change_freeze)*/
+
 
 local function PermaPropsPhys( ply, ent )
 
