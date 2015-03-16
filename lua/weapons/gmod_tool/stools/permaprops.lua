@@ -32,7 +32,199 @@ if SERVER then
 	CreateConVar( "pp_freeze", 1, { FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE }, "Free all permaprops on spawn" )
 end
 
-local function RebuildOldTable( data )
+local SpecialENTSSpawn = {}
+SpecialENTSSpawn["gmod_lamp"] = function( ent, data)
+
+	ent:SetFlashlightTexture( data["Texture"] )
+	ent:SetLightFOV( data["fov"] )
+	ent:SetColor( Color( data["r"], data["g"], data["b"], 255 ) )
+	ent:SetDistance( data["distance"] )
+	ent:SetBrightness( data["brightness"] )
+	ent:Switch( true )
+
+	ent:Spawn()
+
+	ent.Texture = data["Texture"]
+	ent.KeyDown = data["KeyDown"]
+	ent.fov = data["fov"]
+	ent.distance = data["distance"]
+	ent.r = data["r"]
+	ent.g = data["g"]
+	ent.b = data["b"]
+	ent.brightness = data["brightness"]
+
+	return true
+
+end
+
+SpecialENTSSpawn["prop_vehicle_jeep"] = function( ent, data)
+
+	if ( ent:GetModel() == "models/buggy.mdl" ) then ent:SetKeyValue( "vehiclescript", "scripts/vehicles/jeep_test.txt" ) end
+	if ( ent:GetModel() == "models/vehicle.mdl" ) then ent:SetKeyValue( "vehiclescript", "scripts/vehicles/jalopy.txt" ) end
+
+	if ( data["VehicleTable"] && data["VehicleTable"].KeyValues ) then
+		for k, v in pairs( data["VehicleTable"].KeyValues ) do
+			ent:SetKeyValue( k, v )
+		end
+	end
+
+	ent:Spawn()
+	ent:Activate()
+
+	ent:SetVehicleClass( data["VehicleName"] )
+	ent.VehicleName = data["VehicleName"]
+	ent.VehicleTable = data["VehicleTable"]
+	ent.ClassOverride = data["Class"]
+
+	return true
+
+end
+SpecialENTSSpawn["prop_vehicle_jeep_old"] = SpecialENTSSpawn["prop_vehicle_jeep"]
+SpecialENTSSpawn["prop_vehicle_airboat"] = SpecialENTSSpawn["prop_vehicle_jeep"]
+SpecialENTSSpawn["prop_vehicle_prisoner_pod"] = SpecialENTSSpawn["prop_vehicle_jeep"]
+
+local SpecialENTSSave = {}
+SpecialENTSSave["gmod_lamp"] = function( ent )
+
+	local content = {}
+	content.Other = {}
+	content.Other["Texture"] = ent.Texture
+	content.Other["KeyDown"] = ent.KeyDown
+	content.Other["fov"] = ent.fov
+	content.Other["distance"] = ent.distance
+	content.Other["r"] = ent.r
+	content.Other["g"] = ent.g
+	content.Other["b"] = ent.b
+	content.Other["brightness"] = ent.brightness
+
+	return content
+
+end
+
+SpecialENTSSave["prop_vehicle_jeep"] = function( ent )
+
+	if not ent.VehicleTable then return false end
+
+	local content = {}
+	content.Other = {}
+	content.Other["VehicleName"] = ent.VehicleName
+	content.Other["VehicleTable"] = ent.VehicleTable
+	content.Other["ClassOverride"] = ent.ClassOverride
+
+	return content
+
+end
+SpecialENTSSave["prop_vehicle_jeep_old"] = SpecialENTSSave["prop_vehicle_jeep"]
+SpecialENTSSave["prop_vehicle_airboat"] = SpecialENTSSave["prop_vehicle_jeep"]
+SpecialENTSSave["prop_vehicle_prisoner_pod"] = SpecialENTSSave["prop_vehicle_jeep"]
+
+local function PPGetEntTable( ent )
+
+	if CLIENT then return end
+
+	if !ent or !ent:IsValid() then return false end
+
+	local content = {}
+	content.Class = ent:GetClass()
+	content.Pos = ent:GetPos()
+	content.Angle = ent:GetAngles()
+	content.Model = ent:GetModel()
+	content.Skin = ent:GetSkin()
+	content.Mins, content.Maxs = ent:GetCollisionBounds()
+	content.ColGroup = ent:GetCollisionGroup()
+	content.Name = ent:GetName()
+	content.ModelScale = ent:GetModelScale()
+	content.Color = ent:GetColor()
+	content.Material = ent:GetMaterial()
+	content.Solid = ent:GetSolid()
+	
+	if SpecialENTSSave[ent:GetClass()] != nil and isfunction(SpecialENTSSave[ent:GetClass()]) then
+
+		local othercontent = SpecialENTSSave[ent:GetClass()](ent)
+		if not othercontent then return false end
+		if othercontent != nil and istable(othercontent) then
+			table.Merge(content, othercontent)
+		end
+
+	end
+
+	if ( ent.GetNetworkVars ) then
+		content.DT = ent:GetNetworkVars()
+	end
+
+	return content
+
+end
+
+local function PPEntityFromTable( data, id )
+
+	if CLIENT then return end
+
+	if not id or not isnumber(id) then return false end
+
+	local ent = ents.Create( data.Class )
+	if !ent or !ent:IsValid() then return false end
+	ent:SetPos( data.Pos or Vector(0, 0, 0) )
+	ent:SetAngles( data.Angle or Angle(0, 0, 0) )
+	ent:SetModel( data.Model or "models/error.mdl" )
+	ent:SetSkin( data.Skin or 0 )
+	ent:SetCollisionBounds( ( data.Mins or 0 ), ( data.Maxs or 0 ) )
+	ent:SetCollisionGroup( data.ColGroup or 0 )
+	ent:SetName( data.Name or "" )
+	ent:SetModelScale( data.ModelScale or 1 )
+	ent:SetMaterial( data.Material or "" )
+	ent:SetSolid( data.Solid or 6 )
+
+	if SpecialENTSSpawn[ent:GetClass()] != nil and isfunction(SpecialENTSSpawn[ent:GetClass()]) then
+
+		SpecialENTSSpawn[ent:GetClass()](ent, data.Other)
+
+	else
+
+		ent:Spawn()
+
+	end
+
+	ent:SetRenderMode( RENDERMODE_TRANSALPHA )
+	ent:SetColor( data.Color or Color(255, 255, 255, 255) )
+
+	if data.EntityMods != nil and istable(data.EntityMods) then -- OLD DATA
+
+		if data.EntityMods.material then
+			e:SetMaterial( data.EntityMods.material["MaterialOverride"] or "")
+		end
+		
+		if data.EntityMods.colour then
+			e:SetColor( data.EntityMods.colour.Color or Color(255, 255, 255, 255))
+		end
+
+	end
+
+	if ( ent.RestoreNetworkVars and data.DT ) then
+		ent:RestoreNetworkVars( data.DT )
+	end
+
+	ent.ID = id
+	ent.PermaProps = true
+
+
+	if (GetConVarNumber("pp_freeze") or 0) == 1 then
+		local phys = ent:GetPhysicsObject()
+		if phys and phys:IsValid() then
+			phys:EnableMotion(false)
+		end
+	else
+		local phys = ent:GetPhysicsObject()
+		if phys and phys:IsValid() then
+			phys:EnableMotion(true)
+		end
+	end
+
+	return ent
+
+end
+
+local function PPRebuildOldTable( data )
 
 	if CLIENT then return end
 
@@ -49,23 +241,13 @@ local function RebuildOldTable( data )
 	e:SetCollisionGroup( data.collision or 0)
 	e:Spawn()
 
-	local content = duplicator.CopyEntTable( e )
-	content.Constraints = {}
-	content.ConstraintSystem = {}
+	local content = PPGetEntTable( e )
+	if not content then return end
 
 	e:Remove()
 
-	local new_ent = duplicator.CreateEntityFromTable(nil, content)
+	local new_ent = PPEntityFromTable(content, tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1)
 	if !new_ent or !new_ent:IsValid() then return end
-	new_ent["EntityMods"] = content["EntityMods"]
-	duplicator.ApplyEntityModifiers( nil, new_ent )
-	new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
-	new_ent.PermaProps = true
-
-	local phys = new_ent:GetPhysicsObject()
-	if phys and phys:IsValid() then
-		phys:EnableMotion(false)
-	end
 
 	sql.Query("INSERT INTO permaprops (id, map, content) VALUES(NULL, ".. sql.SQLStr(game.GetMap()) ..", ".. sql.SQLStr(util.TableToJSON(content)) ..");")
 
@@ -95,38 +277,16 @@ function ReloadPermaProps()
 
 			local data = util.JSONToTable(v.content)
 
-
 			if data.pos != nil then
 				
-				RebuildOldTable(data)
+				PPRebuildOldTable(data)
 				sql.Query("DELETE FROM permaprops WHERE id = ".. v.id ..";")
 				continue
 
 			end
 
-			local e = duplicator.CreateEntityFromTable(nil, data)
+			local e = PPEntityFromTable(data, tonumber(v.id))
 			if !e or !e:IsValid() then continue end
-			e["EntityMods"] = data["EntityMods"]
-			duplicator.ApplyEntityModifiers( nil, e )
-			e.PermaProps = true
-			e.ID = v.id
-
-			local phys = e:GetPhysicsObject()
-			if phys and phys:IsValid() then
-				phys:EnableMotion(false)
-			end
-
-			/*if (GetConVarNumber("pp_freeze") or 0) == 1 then -- DEVVV
-				local phys = e:GetPhysicsObject()
-				if phys and phys:IsValid() then
-					phys:EnableMotion(false)
-				end
-			else
-				local phys = e:GetPhysicsObject()
-				if phys and phys:IsValid() then
-					phys:EnableMotion(true)
-				end
-			end*/
 
 		end
 
@@ -148,23 +308,11 @@ function TOOL:LeftClick(trace)
 	if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
 	if ent.PermaProps then ply:ChatPrint( "That entity is already permanent !" ) return end
 
-	local content = duplicator.CopyEntTable( ent )
-	content.Constraints = {} -- No Constraints :)
-	content.ConstraintSystem = {} -- No Constraints :)
+	local content = PPGetEntTable(ent)
+	if not content then return end
 
-	ent:Remove()
-
-	local new_ent = duplicator.CreateEntityFromTable(nil, content)
+	local new_ent = PPEntityFromTable(content, tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1)
 	if !new_ent or !new_ent:IsValid() then return end
-	new_ent["EntityMods"] = content["EntityMods"]
-	duplicator.ApplyEntityModifiers( nil, new_ent )
-	new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
-	new_ent.PermaProps = true
-
-	local phys = new_ent:GetPhysicsObject()
-	if phys and phys:IsValid() then
-		phys:EnableMotion(false)
-	end
 
 	local effectdata = EffectData()
 	effectdata:SetOrigin(ent:GetPos())
@@ -175,6 +323,8 @@ function TOOL:LeftClick(trace)
 
 	sql.Query("INSERT INTO permaprops (id, map, content) VALUES(NULL, ".. sql.SQLStr(game.GetMap()) ..", ".. sql.SQLStr(util.TableToJSON(content)) ..");")
 	ply:ChatPrint("You saved " .. ent:GetClass() .. " with model ".. ent:GetModel() .. " to the database.")
+
+	ent:Remove()
 
 	return true
 
@@ -194,12 +344,12 @@ function TOOL:RightClick(trace)
 	if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
 	if not ent.PermaProps then ply:ChatPrint( "That is not a PermaProp !" ) return end
 	if not ent.ID then ply:ChatPrint( "ERROR: ID not found" ) return end
-	
-	ent:Remove()
 
 	sql.Query("DELETE FROM permaprops WHERE id = ".. ent.ID ..";")
 
 	ply:ChatPrint("You erased " .. ent:GetClass() .. " with a model of " .. ent:GetModel() .. " from the database.")
+
+	ent:Remove()
 
 	return true
 
@@ -219,25 +369,13 @@ function TOOL:Reload(trace)
 		if not ply:IsAdmin() then return end
 		if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
 		
-		local content = duplicator.CopyEntTable( ent )
-		content.Constraints = {} -- No Constraints :)
-		content.ConstraintSystem = {} -- No Constraints :)
+		local content = PPGetEntTable(ent)
+		if not content then return end
 
 		sql.Query("UPDATE permaprops set content = ".. sql.SQLStr(util.TableToJSON(content)) .." WHERE id = ".. ent.ID .." AND map = ".. sql.SQLStr(game.GetMap()) .. ";")
 
-		local new_ent = duplicator.CreateEntityFromTable(nil, content)
+		local new_ent = PPEntityFromTable(content, tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1)
 		if !new_ent or !new_ent:IsValid() then return end
-		new_ent["EntityMods"] = content["EntityMods"]
-		duplicator.ApplyEntityModifiers( nil, new_ent )
-		new_ent.ID = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1
-		new_ent.PermaProps = true
-
-		local phys = new_ent:GetPhysicsObject()
-		if phys and phys:IsValid() then
-			phys:EnableMotion(false)
-		end
-
-		ent:Remove()
 
 		local effectdata = EffectData()
 		effectdata:SetOrigin(ent:GetPos())
@@ -247,6 +385,8 @@ function TOOL:Reload(trace)
 		util.Effect("Sparks", effectdata)
 
 		ply:ChatPrint("You updated the " .. ent:GetClass() .. " you selected in the database.")
+
+		ent:Remove()
 
 
 	else
@@ -265,7 +405,7 @@ function TOOL.BuildCPanel(panel)
 	panel:AddControl("Label",{Text = "------ Configuration ------"})
 	panel:AddControl("Button",{Label = "Admin can touch PermaProps", Command = "pp_phys_change_admin"})
 	panel:AddControl("Button",{Label = "SuperAdmin can touch PermaProps", Command = "pp_phys_change_sadmin"})
-	--panel:AddControl("Button",{Label = "Freeze all PermaProps", Command = "pp_change_freeze"})
+	panel:AddControl("Button",{Label = "Freeze all PermaProps", Command = "pp_change_freeze"})
 	panel:AddControl("Label",{Text = "-------- Functions --------"})
 	panel:AddControl("Button", {Text = "Remove all PermaProps", Command = "perma_remove_all"})
 
@@ -324,7 +464,7 @@ local function pp_phys_change_sadmin( ply ) -- Shit but work !!
 end
 concommand.Add("pp_phys_change_sadmin", pp_phys_change_sadmin)
 
-/*local function pp_change_freeze( ply ) -- Shit but work !!
+local function pp_change_freeze( ply ) -- Shit but work !!
 
 	if CLIENT then return end
 
@@ -341,7 +481,7 @@ concommand.Add("pp_phys_change_sadmin", pp_phys_change_sadmin)
 	end
 
 end
-concommand.Add("pp_change_freeze", pp_change_freeze)*/
+concommand.Add("pp_change_freeze", pp_change_freeze)
 
 
 local function PermaPropsPhys( ply, ent )
