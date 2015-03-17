@@ -191,11 +191,11 @@ local function PPEntityFromTable( data, id )
 	if data.EntityMods != nil and istable(data.EntityMods) then -- OLD DATA
 
 		if data.EntityMods.material then
-			e:SetMaterial( data.EntityMods.material["MaterialOverride"] or "")
+			ent:SetMaterial( data.EntityMods.material["MaterialOverride"] or "")
 		end
 		
 		if data.EntityMods.colour then
-			e:SetColor( data.EntityMods.colour.Color or Color(255, 255, 255, 255))
+			ent:SetColor( data.EntityMods.colour.Color or Color(255, 255, 255, 255))
 		end
 
 	end
