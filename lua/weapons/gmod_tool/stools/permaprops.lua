@@ -508,7 +508,7 @@ local function PermaPropsPhys( ply, ent, phys )
 	
 end
 hook.Add("PhysgunPickup", "PermaPropsPhys", PermaPropsPhys)
-hook.Add( "CanPlayerUnfreeze", "PermaPropsUnfreeze", function( ply, ent, phys ) -- Prevents people from pressing RELOAD on the physgun
+hook.Add( "CanPlayerUnfreeze", "PermaPropsUnfreeze", PermaPropsPhys) -- Prevents people from pressing RELOAD on the physgun
 hook.Add( "CanTool", "PermaPropsPhysTool", function( ply, tr, tool )
 	if CLIENT then return end
 	if IsValid(tr.Entity) and tr.Entity.PermaProps and tool ~= "permaprops" then
