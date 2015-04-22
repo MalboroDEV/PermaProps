@@ -374,7 +374,7 @@ function TOOL:Reload(trace)
 
 		sql.Query("UPDATE permaprops set content = ".. sql.SQLStr(util.TableToJSON(content)) .." WHERE id = ".. ent.PermaProps_ID .." AND map = ".. sql.SQLStr(game.GetMap()) .. ";")
 
-		local new_ent = PPEntityFromTable(content, tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1)
+		local new_ent = PPEntityFromTable(content, ent.PermaProps_ID)
 		if !new_ent or !new_ent:IsValid() then return end
 
 		local effectdata = EffectData()
