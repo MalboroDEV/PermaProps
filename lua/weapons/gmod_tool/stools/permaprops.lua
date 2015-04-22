@@ -204,7 +204,7 @@ local function PPEntityFromTable( data, id )
 		ent:RestoreNetworkVars( data.DT )
 	end
 
-	ent.ID = id
+	ent.PermaProps_ID = id
 	ent.PermaProps = true
 
 
@@ -343,9 +343,9 @@ function TOOL:RightClick(trace)
 	if not ent:IsValid() then ply:ChatPrint( "That is not a valid entity !" ) return end
 	if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
 	if not ent.PermaProps then ply:ChatPrint( "That is not a PermaProp !" ) return end
-	if not ent.ID then ply:ChatPrint( "ERROR: ID not found" ) return end
+	if not ent.PermaProps_ID then ply:ChatPrint( "ERROR: ID not found" ) return end
 
-	sql.Query("DELETE FROM permaprops WHERE id = ".. ent.ID ..";")
+	sql.Query("DELETE FROM permaprops WHERE id = ".. ent.PermaProps_ID ..";")
 
 	ply:ChatPrint("You erased " .. ent:GetClass() .. " with a model of " .. ent:GetModel() .. " from the database.")
 
@@ -372,7 +372,7 @@ function TOOL:Reload(trace)
 		local content = PPGetEntTable(ent)
 		if not content then return end
 
-		sql.Query("UPDATE permaprops set content = ".. sql.SQLStr(util.TableToJSON(content)) .." WHERE id = ".. ent.ID .." AND map = ".. sql.SQLStr(game.GetMap()) .. ";")
+		sql.Query("UPDATE permaprops set content = ".. sql.SQLStr(util.TableToJSON(content)) .." WHERE id = ".. ent.PermaProps_ID .." AND map = ".. sql.SQLStr(game.GetMap()) .. ";")
 
 		local new_ent = PPEntityFromTable(content, tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1)
 		if !new_ent or !new_ent:IsValid() then return end
@@ -435,11 +435,15 @@ local function pp_phys_change_admin( ply ) -- Shit but work !!
 	local Value = (GetConVarNumber("pp_phys_admin") or 0)
 
 	if Value == 1 then
+
 		game.ConsoleCommand("pp_phys_admin 0\n")
 		ply:ChatPrint("Admin can't touch permaprops !")
+
 	elseif Value == 0 then
+
 		game.ConsoleCommand("pp_phys_admin 1\n")
 		ply:ChatPrint("Admin can touch permaprops !")
+		
 	end
 
 end
@@ -454,11 +458,15 @@ local function pp_phys_change_sadmin( ply ) -- Shit but work !!
 	local Value = (GetConVarNumber("pp_phys_sadmin") or 0)
 
 	if Value == 1 then
+
 		game.ConsoleCommand("pp_phys_sadmin 0\n")
 		ply:ChatPrint("SuperAdmin can't touch permaprops !")
+
 	elseif Value == 0 then
+
 		game.ConsoleCommand("pp_phys_sadmin 1\n")
 		ply:ChatPrint("SuperAdmin can touch permaprops !")
+
 	end
 
 end
@@ -473,22 +481,26 @@ local function pp_change_freeze( ply ) -- Shit but work !!
 	local Value = (GetConVarNumber("pp_freeze") or 0)
 
 	if Value == 1 then
+
 		game.ConsoleCommand("pp_freeze 0\n")
 		ply:ChatPrint("All permaprops spawn unfrozen !")
+
 	elseif Value == 0 then
+
 		game.ConsoleCommand("pp_freeze 1\n")
 		ply:ChatPrint("All permaprops spawn frozen !")
+
 	end
 
 end
 concommand.Add("pp_change_freeze", pp_change_freeze)
 
 
-local function PermaPropsPhys( ply, ent )
+local function PermaPropsPhys( ply, ent, phys )
 
 	if CLIENT then return end
 
-	if ent.PermaProps == true then
+	if ent.PermaProps then
 
 		if ply:IsAdmin() and GetConVarNumber("pp_phys_admin") == 1 then
 
@@ -508,3 +520,52 @@ local function PermaPropsPhys( ply, ent )
 	
 end
 hook.Add("PhysgunPickup", "PermaPropsPhys", PermaPropsPhys)
+hook.Add( "CanPlayerUnfreeze", "PermaPropsUnfreeze", PermaPropsPhys) -- Prevents people from pressing RELOAD on the physgun
+
+hook.Add( "CanTool", "PermaPropsPhysTool", function( ply, tr, tool )
+
+	if CLIENT then return end
+
+	if IsValid(tr.Entity) and tr.Entity.PermaProps and tool ~= "permaprops" then
+
+		if ply:IsAdmin() and GetConVarNumber("pp_phys_admin") == 1 then -- Make another convar option if you want.
+
+			return true
+
+		elseif ply:IsSuperAdmin() and GetConVarNumber("pp_phys_sadmin") == 1 then
+
+			return true
+
+		else
+
+			return false
+
+		end
+
+	end
+
+end)
+
+hook.Add( "CanProperty", "PermaPropsProperty", function( ply, property, ent ) -- Context Menu (Right clicking on the entity)
+
+	if CLIENT then return end
+
+	if IsValid(ent) and ent.PermaProps and tool ~= "permaprops" then
+
+		if ply:IsAdmin() and GetConVarNumber("pp_phys_admin") == 1 then -- Make another convar option if you want.
+
+			return true
+
+		elseif ply:IsSuperAdmin() and GetConVarNumber("pp_phys_sadmin") == 1 then
+
+			return true
+
+		else
+
+			return false
+
+		end
+
+	end
+
+end)
