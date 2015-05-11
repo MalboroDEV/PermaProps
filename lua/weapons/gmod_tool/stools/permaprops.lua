@@ -29,7 +29,6 @@ if SERVER then
 	sql.Query("CREATE TABLE IF NOT EXISTS permaprops('id' INTEGER NOT NULL, 'map' TEXT NOT NULL, 'content' TEXT NOT NULL, PRIMARY KEY('id'));")
 	CreateConVar( "pp_phys_admin", 0, { FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE }, "Admin can touch permaprops" )
 	CreateConVar( "pp_phys_sadmin", 1, { FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE }, "Only Super Admin can touch permaprops" )
-	CreateConVar( "pp_freeze", 1, { FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE }, "Free all permaprops on spawn" )
 end
 
 local SpecialENTSSpawn = {}
@@ -152,6 +151,10 @@ local function PPGetEntTable( ent )
 		content.DT = ent:GetNetworkVars()
 	end
 
+	if ent:GetPhysicsObject() and ent:GetPhysicsObject():IsValid() then
+		content.Frozen = !ent:GetPhysicsObject():IsMoveable()
+	end
+
 	return content
 
 end
@@ -207,17 +210,20 @@ local function PPEntityFromTable( data, id )
 	ent.PermaProps_ID = id
 	ent.PermaProps = true
 
-
-	if (GetConVarNumber("pp_freeze") or 0) == 1 then
-		local phys = ent:GetPhysicsObject()
-		if phys and phys:IsValid() then
-			phys:EnableMotion(false)
-		end
-	else
+	if data.Frozen != nil and data.Frozen == false then
+		
 		local phys = ent:GetPhysicsObject()
 		if phys and phys:IsValid() then
 			phys:EnableMotion(true)
 		end
+
+	else
+
+		local phys = ent:GetPhysicsObject()
+		if phys and phys:IsValid() then
+			phys:EnableMotion(false)
+		end
+
 	end
 
 	return ent
@@ -246,7 +252,10 @@ local function PPRebuildOldTable( data )
 
 	e:Remove()
 
-	local new_ent = PPEntityFromTable(content, tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1)
+	local max = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;"))
+	if not max then max = 1 else max = max + 1 end
+
+	local new_ent = PPEntityFromTable(content, max)
 	if !new_ent or !new_ent:IsValid() then return end
 
 	sql.Query("INSERT INTO permaprops (id, map, content) VALUES(NULL, ".. sql.SQLStr(game.GetMap()) ..", ".. sql.SQLStr(util.TableToJSON(content)) ..");")
@@ -311,7 +320,10 @@ function TOOL:LeftClick(trace)
 	local content = PPGetEntTable(ent)
 	if not content then return end
 
-	local new_ent = PPEntityFromTable(content, tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;")) or 1)
+	local max = tonumber(sql.QueryValue("SELECT MAX(id) FROM permaprops;"))
+	if not max then max = 1 else max = max + 1 end
+
+	local new_ent = PPEntityFromTable(content, max)
 	if !new_ent or !new_ent:IsValid() then return end
 
 	local effectdata = EffectData()
@@ -405,11 +417,12 @@ function TOOL.BuildCPanel(panel)
 	panel:AddControl("Label",{Text = "------ Configuration ------"})
 	panel:AddControl("Button",{Label = "Admin can touch PermaProps", Command = "pp_phys_change_admin"})
 	panel:AddControl("Button",{Label = "SuperAdmin can touch PermaProps", Command = "pp_phys_change_sadmin"})
-	panel:AddControl("Button",{Label = "Freeze all PermaProps", Command = "pp_change_freeze"})
 	panel:AddControl("Label",{Text = "-------- Functions --------"})
 	panel:AddControl("Button", {Text = "Remove all PermaProps", Command = "perma_remove_all"})
 
 end
+
+//////////////////////////////////// REPLACE THIS ////////////////////////////////////
 
 local function PermaRemoveAll( ply )
 
@@ -472,28 +485,8 @@ local function pp_phys_change_sadmin( ply ) -- Shit but work !!
 end
 concommand.Add("pp_phys_change_sadmin", pp_phys_change_sadmin)
 
-local function pp_change_freeze( ply ) -- Shit but work !!
 
-	if CLIENT then return end
-
-	if not ply:IsSuperAdmin() then return end
-
-	local Value = (GetConVarNumber("pp_freeze") or 0)
-
-	if Value == 1 then
-
-		game.ConsoleCommand("pp_freeze 0\n")
-		ply:ChatPrint("All permaprops spawn unfrozen !")
-
-	elseif Value == 0 then
-
-		game.ConsoleCommand("pp_freeze 1\n")
-		ply:ChatPrint("All permaprops spawn frozen !")
-
-	end
-
-end
-concommand.Add("pp_change_freeze", pp_change_freeze)
+//////////////////////////////////////////////////////////////////////////////////////
 
 
 local function PermaPropsPhys( ply, ent, phys )
