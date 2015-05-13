@@ -303,6 +303,7 @@ function ReloadPermaProps()
 
 end
 hook.Add("InitPostEntity", "InitializePermaProps", ReloadPermaProps)
+timer.Simple(5, function() ReloadPermaProps() end) -- When the hook isn't call ...
 
 function TOOL:LeftClick(trace)
 
