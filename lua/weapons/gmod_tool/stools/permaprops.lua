@@ -14,7 +14,7 @@
 		By Malboro the 28/12/2012
 */
 
-TOOL.Category		=	"SaveProps"
+TOOL.Category		=	"Props Tool"
 TOOL.Name			=	"PermaProps"
 TOOL.Command		=	nil
 TOOL.ConfigName		=	""
@@ -303,17 +303,17 @@ function ReloadPermaProps()
 
 end
 hook.Add("InitPostEntity", "InitializePermaProps", ReloadPermaProps)
+hook.Add("PostCleanupMap", "WhenCleanUpPermaProps", ReloadPermaProps) -- #MOMO
 timer.Simple(5, function() ReloadPermaProps() end) -- When the hook isn't call ...
 
 function TOOL:LeftClick(trace)
 
 	if CLIENT then return end
 
-	if not trace.Entity:IsValid() or not self:GetOwner():IsAdmin() then return end
-
 	local ent = trace.Entity
 	local ply = self:GetOwner()
 
+	if not ply:IsAdmin() then return end
 	if not ent:IsValid() then ply:ChatPrint( "That is not a valid entity !" ) return end
 	if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
 	if ent.PermaProps then ply:ChatPrint( "That entity is already permanent !" ) return end
@@ -346,8 +346,6 @@ end
 function TOOL:RightClick(trace)
 
 	if CLIENT then return end
-
-	if (not trace.Entity:IsValid()) then return end
 
 	local ent = trace.Entity
 	local ply = self:GetOwner()
