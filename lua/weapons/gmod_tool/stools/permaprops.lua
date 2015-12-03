@@ -82,6 +82,65 @@ SpecialENTSSpawn["prop_vehicle_jeep_old"] = SpecialENTSSpawn["prop_vehicle_jeep"
 SpecialENTSSpawn["prop_vehicle_airboat"] = SpecialENTSSpawn["prop_vehicle_jeep"]
 SpecialENTSSpawn["prop_vehicle_prisoner_pod"] = SpecialENTSSpawn["prop_vehicle_jeep"]
 
+SpecialENTSSpawn["prop_ragdoll"] = function( ent, data )
+
+	if !data or !istable( data ) then return end
+
+	ent:Spawn()
+	ent:Activate()
+	
+	if data["Bones"] then
+
+		for objectid, objectdata in pairs( data["Bones"] ) do
+
+			local Phys = ent:GetPhysicsObjectNum( objectid )
+			if !IsValid( Phys ) then continue end
+		
+			if ( isvector( objectdata.Pos ) && isangle( objectdata.Angle ) ) then
+
+				local pos, ang = LocalToWorld( objectdata.Pos, objectdata.Angle, Vector(0, 0, 0), Angle(0, 0, 0) )
+				Phys:SetPos( pos )
+				Phys:SetAngles( ang )
+				Phys:Wake()
+
+				if objectdata.Frozen then
+					Phys:EnableMotion( false )
+				end
+
+			end
+		
+		end
+
+	end
+
+	if data["BoneManip"] and ent:IsValid() then
+
+		for k, v in pairs( data["BoneManip"] ) do
+
+			if ( v.s ) then ent:ManipulateBoneScale( k, v.s ) end
+			if ( v.a ) then ent:ManipulateBoneAngles( k, v.a ) end
+			if ( v.p ) then ent:ManipulateBonePosition( k, v.p ) end
+
+		end
+
+	end
+
+	if data["Flex"] and ent:IsValid() then
+
+		for k, v in pairs( data["Flex"] ) do
+			ent:SetFlexWeight( k, v )
+		end
+
+		if ( Scale ) then
+			ent:SetFlexScale( Scale )
+		end
+
+	end
+
+	return true
+
+end
+
 local SpecialENTSSave = {}
 SpecialENTSSave["gmod_lamp"] = function( ent )
 
@@ -116,6 +175,68 @@ end
 SpecialENTSSave["prop_vehicle_jeep_old"] = SpecialENTSSave["prop_vehicle_jeep"]
 SpecialENTSSave["prop_vehicle_airboat"] = SpecialENTSSave["prop_vehicle_jeep"]
 SpecialENTSSave["prop_vehicle_prisoner_pod"] = SpecialENTSSave["prop_vehicle_jeep"]
+
+SpecialENTSSave["prop_ragdoll"] = function( ent )
+
+	local content = {}
+	content.Other = {}
+	content.Other["Bones"] = {}
+
+	local num = ent:GetPhysicsObjectCount()
+	for objectid = 0, num - 1 do
+
+		local obj = ent:GetPhysicsObjectNum( objectid )
+		if ( !obj:IsValid() ) then continue end
+
+		content.Other["Bones"][ objectid ] = {}
+
+		content.Other["Bones"][ objectid ].Pos = obj:GetPos()
+		content.Other["Bones"][ objectid ].Angle = obj:GetAngles()
+		content.Other["Bones"][ objectid ].Frozen = !obj:IsMoveable()
+		if ( obj:IsAsleep() ) then content.Other["Bones"][ objectid ].Sleep = true end
+
+		content.Other["Bones"][ objectid ].Pos, content.Other["Bones"][ objectid ].Angle = WorldToLocal( content.Other["Bones"][ objectid ].Pos, content.Other["Bones"][ objectid ].Angle, Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
+
+	end
+
+	if ( ent:HasBoneManipulations() ) then
+	
+		content.Other["BoneManip"] = {}
+
+		for i = 0, ent:GetBoneCount() do
+	
+			local t = {}
+		
+			local s = ent:GetManipulateBoneScale( i )
+			local a = ent:GetManipulateBoneAngles( i )
+			local p = ent:GetManipulateBonePosition( i )
+		
+			if ( s != Vector( 1, 1, 1 ) ) then t[ 's' ] = s end -- scale
+			if ( a != Angle( 0, 0, 0 ) ) then t[ 'a' ] = a end -- angle
+			if ( p != Vector( 0, 0, 0 ) ) then t[ 'p' ] = p end -- position
+	
+			if ( table.Count( t ) > 0 ) then
+				content.Other["BoneManip"][ i ] = t
+			end
+	
+		end
+
+	end
+
+	content.Other["FlexScale"] = ent:GetFlexScale()
+	for i = 0, ent:GetFlexNum() do
+
+		local w = ent:GetFlexWeight( i )
+		if ( w != 0 ) then
+			content.Other["Flex"] = content.Other["Flex"] or {}
+			content.Other["Flex"][ i ] = w
+		end
+
+	end
+
+	return content
+
+end
 
 local function PPGetEntTable( ent )
 
@@ -278,7 +399,7 @@ function ReloadPermaProps()
 
 	local content = sql.Query( "SELECT * FROM permaprops;" )
 
-	if content == nil then return end
+	if not content or content == nil then return end
 	
 	for k, v in pairs( content ) do
 
@@ -423,66 +544,70 @@ end
 
 //////////////////////////////////// REPLACE THIS ////////////////////////////////////
 
-local function PermaRemoveAll( ply )
+if SERVER then
 
-	if CLIENT then return end
+	local function PermaRemoveAll( ply )
 
-	if not ply:IsAdmin() then return end
+		if CLIENT then return end
 
-	sql.Query("DELETE FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) ..";")
+		if not ply:IsAdmin() then return end
 
-	ply:ChatPrint("You erased all props from the map")
+		sql.Query("DELETE FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) ..";")
 
-	ReloadPermaProps()
+		ply:ChatPrint("You erased all props from the map")
 
-end
-concommand.Add("perma_remove_all", PermaRemoveAll)
-
-local function pp_phys_change_admin( ply ) -- Shit but work !!
-
-	if CLIENT then return end
-
-	if not ply:IsSuperAdmin() then return end
-
-	local Value = (GetConVarNumber("pp_phys_admin") or 0)
-
-	if Value == 1 then
-
-		game.ConsoleCommand("pp_phys_admin 0\n")
-		ply:ChatPrint("Admin can't touch permaprops !")
-
-	elseif Value == 0 then
-
-		game.ConsoleCommand("pp_phys_admin 1\n")
-		ply:ChatPrint("Admin can touch permaprops !")
-		
-	end
-
-end
-concommand.Add("pp_phys_change_admin", pp_phys_change_admin)
-
-local function pp_phys_change_sadmin( ply ) -- Shit but work !!
-
-	if CLIENT then return end
-
-	if not ply:IsSuperAdmin() then return end
-
-	local Value = (GetConVarNumber("pp_phys_sadmin") or 0)
-
-	if Value == 1 then
-
-		game.ConsoleCommand("pp_phys_sadmin 0\n")
-		ply:ChatPrint("SuperAdmin can't touch permaprops !")
-
-	elseif Value == 0 then
-
-		game.ConsoleCommand("pp_phys_sadmin 1\n")
-		ply:ChatPrint("SuperAdmin can touch permaprops !")
+		ReloadPermaProps()
 
 	end
+	concommand.Add("perma_remove_all", PermaRemoveAll)
+
+	local function pp_phys_change_admin( ply ) -- Shit but work !!
+
+		if CLIENT then return end
+
+		if not ply:IsSuperAdmin() then return end
+
+		local Value = (GetConVarNumber("pp_phys_admin") or 0)
+
+		if Value == 1 then
+
+			game.ConsoleCommand("pp_phys_admin 0\n")
+			ply:ChatPrint("Admin can't touch permaprops !")
+
+		elseif Value == 0 then
+
+			game.ConsoleCommand("pp_phys_admin 1\n")
+			ply:ChatPrint("Admin can touch permaprops !")
+			
+		end
+
+	end
+	concommand.Add("pp_phys_change_admin", pp_phys_change_admin)
+
+	local function pp_phys_change_sadmin( ply ) -- Shit but work !!
+
+		if CLIENT then return end
+
+		if not ply:IsSuperAdmin() then return end
+
+		local Value = (GetConVarNumber("pp_phys_sadmin") or 0)
+
+		if Value == 1 then
+
+			game.ConsoleCommand("pp_phys_sadmin 0\n")
+			ply:ChatPrint("SuperAdmin can't touch permaprops !")
+
+		elseif Value == 0 then
+
+			game.ConsoleCommand("pp_phys_sadmin 1\n")
+			ply:ChatPrint("SuperAdmin can touch permaprops !")
+
+		end
+
+	end
+	concommand.Add("pp_phys_change_sadmin", pp_phys_change_sadmin)
 
 end
-concommand.Add("pp_phys_change_sadmin", pp_phys_change_sadmin)
 
 
 //////////////////////////////////////////////////////////////////////////////////////
