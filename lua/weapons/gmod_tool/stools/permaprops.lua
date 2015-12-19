@@ -324,8 +324,8 @@ local function PPEntityFromTable( data, id )
 
 	end
 
-	if ( ent.RestoreNetworkVars and data.DT ) then
-		ent:RestoreNetworkVars( data.DT )
+	if ent.RestoreNetworkVars and isfunction(ent.RestoreNetworkVars) and data.DT then
+		ent.RestoreNetworkVars( data.DT )
 	end
 
 	ent.PermaProps_ID = id
