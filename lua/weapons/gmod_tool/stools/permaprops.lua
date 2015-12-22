@@ -141,6 +141,27 @@ SpecialENTSSpawn["prop_ragdoll"] = function( ent, data )
 
 end
 
+SpecialENTSSpawn["sammyservers_textscreen"] = function( ent, data )
+
+	if !data or !istable( data ) then return end
+
+	ent:Spawn()
+	ent:Activate()
+	
+	if data["Lines"] then
+
+		for k, v in pairs(data["Lines"] or {}) do
+
+			ent:SetLine(k, v.text, Color(v.color.r, v.color.g, v.color.b, v.color.a), v.size)
+
+		end
+
+	end
+
+	return true
+
+end
+
 local SpecialENTSSave = {}
 SpecialENTSSave["gmod_lamp"] = function( ent )
 
@@ -238,6 +259,16 @@ SpecialENTSSave["prop_ragdoll"] = function( ent )
 
 end
 
+SpecialENTSSave["sammyservers_textscreen"] = function( ent )
+
+	local content = {}
+	content.Other = {}
+	content.Other["Lines"] = ent.lines or {}
+
+	return content
+
+end
+
 local function PPGetEntTable( ent )
 
 	if CLIENT then return end
@@ -324,8 +355,15 @@ local function PPEntityFromTable( data, id )
 
 	end
 
-	if ent.RestoreNetworkVars and isfunction(ent.RestoreNetworkVars) and data.DT then
-		ent.RestoreNetworkVars( data.DT )
+	if data.DT then
+
+		for k, v in pairs( data.DT ) do
+
+			if ( data.DT[ k ] == nil ) then continue end
+			ent[ "Set" .. k ]( ent, data.DT[ k ] )
+
+		end
+
 	end
 
 	ent.PermaProps_ID = id
@@ -686,3 +724,5 @@ hook.Add( "CanProperty", "PermaPropsProperty", function( ply, property, ent ) --
 	end
 
 end)
+
+timer.Simple(5, function() hook.Remove("CanTool", "textScreensPreventTools") end)
