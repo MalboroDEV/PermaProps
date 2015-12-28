@@ -300,7 +300,7 @@ local function PPGetEntTable( ent )
 	end
 
 	if ( ent.GetNetworkVars ) then
-		content.DT = ent.GetNetworkVars()
+		content.DT = ent:GetNetworkVars()
 	end
 
 	if ent:GetPhysicsObject() and ent:GetPhysicsObject():IsValid() then
@@ -356,8 +356,15 @@ local function PPEntityFromTable( data, id )
 
 	end
 
-	if ent.RestoreNetworkVars and isfunction(ent.RestoreNetworkVars) and data.DT then
-		ent.RestoreNetworkVars( data.DT )
+	if data.DT then
+
+		for k, v in pairs( data.DT ) do
+
+			if ( data.DT[ k ] == nil ) then continue end
+			ent[ "Set" .. k ]( ent, data.DT[ k ] )
+
+		end
+
 	end
 
 	ent.PermaProps_ID = id
