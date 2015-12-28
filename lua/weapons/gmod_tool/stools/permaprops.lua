@@ -300,7 +300,7 @@ local function PPGetEntTable( ent )
 	end
 
 	if ( ent.GetNetworkVars ) then
-		content.DT = ent:GetNetworkVars()
+		content.DT = ent.GetNetworkVars()
 	end
 
 	if ent:GetPhysicsObject() and ent:GetPhysicsObject():IsValid() then
@@ -317,8 +317,9 @@ local function PPEntityFromTable( data, id )
 
 	if not id or not isnumber(id) then return false end
 
-	local ent = ents.Create( data.Class )
-	if !ent or !ent:IsValid() then return false end
+	local ent = ents.Create(data.Class)
+	if !ent then return false end
+	if !ent:IsVehicle() then if !ent:IsValid() then return false end end
 	ent:SetPos( data.Pos or Vector(0, 0, 0) )
 	ent:SetAngles( data.Angle or Angle(0, 0, 0) )
 	ent:SetModel( data.Model or "models/error.mdl" )
@@ -355,15 +356,8 @@ local function PPEntityFromTable( data, id )
 
 	end
 
-	if data.DT then
-
-		for k, v in pairs( data.DT ) do
-
-			if ( data.DT[ k ] == nil ) then continue end
-			ent[ "Set" .. k ]( ent, data.DT[ k ] )
-
-		end
-
+	if ent.RestoreNetworkVars and isfunction(ent.RestoreNetworkVars) and data.DT then
+		ent.RestoreNetworkVars( data.DT )
 	end
 
 	ent.PermaProps_ID = id
