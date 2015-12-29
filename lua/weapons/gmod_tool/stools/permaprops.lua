@@ -361,6 +361,7 @@ local function PPEntityFromTable( data, id )
 		for k, v in pairs( data.DT ) do
 
 			if ( data.DT[ k ] == nil ) then continue end
+			if !isfunction(ent[ "Set" .. k ]) then continue end
 			ent[ "Set" .. k ]( ent, data.DT[ k ] )
 
 		end
