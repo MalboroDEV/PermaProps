@@ -7,7 +7,7 @@
                                       |___/                                        
 */
 
-print("-------------------------")
+print("-------------------------------")
 print("Loading ServerSide PermaProps")
 include("permaprops/sv_lib.lua")
 include("permaprops/sv_specialfcn.lua")
@@ -16,5 +16,6 @@ include("permaprops/sv_permissions.lua")
 include("permaprops/sv_menu.lua")
 print("Loading ClientSide PermaProps")
 AddCSLuaFile("permaprops/cl_menu.lua")
+AddCSLuaFile("permaprops/cl_drawent.lua")
 print("PermaProps Loaded !")
-print("-------------------------")
+print("-------------------------------")
