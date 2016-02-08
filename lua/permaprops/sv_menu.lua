@@ -71,13 +71,23 @@ local function pp_open_menu( ply )
 	local SendTable = {}
 	local Data_PropsList = sql.Query( "SELECT * FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) .. ";" )
 
-	if Data_PropsList then
+	if Data_PropsList and #Data_PropsList < 500 then
 	
 		for k, v in pairs( Data_PropsList ) do
 
 			local data = util.JSONToTable(v.content)
 
 			SendTable[v.id] = {Model = data.Model, Class = data.Class, Pos = data.Pos, Angle = data.Angle}
+
+		end
+
+	elseif #Data_PropsList > 500 then -- Too much props dude :'(
+
+		for i = 1, 499 do
+			
+			local data = util.JSONToTable(Data_PropsList[i].content)
+
+			SendTable[Data_PropsList[i].id] = {Model = data.Model, Class = data.Class, Pos = data.Pos, Angle = data.Angle}
 
 		end
 

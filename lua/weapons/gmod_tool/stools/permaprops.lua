@@ -113,7 +113,7 @@ function TOOL:Reload(trace)
 
 		PermaProps.SparksEffect( ent )
 
-		ply:ChatPrint("You updated the " .. ent:GetClass() .. " you selected in the database.")
+		ply:ChatPrint("You updated the " .. ent:GetClass() .. " in the database.")
 
 		ent:Remove()
 

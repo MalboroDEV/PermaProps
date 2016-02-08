@@ -11,8 +11,6 @@ if not PermaProps then PermaProps = {} end
 
 function PermaProps.PPGetEntTable( ent )
 
-	if CLIENT then return end
-
 	if !ent or !ent:IsValid() then return false end
 
 	local content = {}
@@ -52,8 +50,6 @@ function PermaProps.PPGetEntTable( ent )
 end
 
 function PermaProps.PPEntityFromTable( data, id )
-
-	if CLIENT then return end
 
 	if not id or not isnumber(id) then return false end
 
@@ -126,8 +122,6 @@ end
 
 function PermaProps.ReloadPermaProps()
 
-	if CLIENT then return end
-	
 	for k, v in pairs( ents.GetAll() ) do
 
 		if v.PermaProps == true then
@@ -138,27 +132,22 @@ function PermaProps.ReloadPermaProps()
 
 	end
 
-	local content = PermaProps.SQL.Query( "SELECT * FROM permaprops;" )
+	local content = PermaProps.SQL.Query( "SELECT * FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) .. ";" )
 
 	if not content or content == nil then return end
 	
 	for k, v in pairs( content ) do
 
-		if game.GetMap() == v.map then
+		local data = util.JSONToTable(v.content)
 
-			local data = util.JSONToTable(v.content)
-
-			local e = PermaProps.PPEntityFromTable(data, tonumber(v.id))
-			if !e or !e:IsValid() then continue end
-
-		end
+		local e = PermaProps.PPEntityFromTable(data, tonumber(v.id))
+		if !e or !e:IsValid() then continue end
 
 	end
 
 end
 hook.Add("InitPostEntity", "InitializePermaProps", PermaProps.ReloadPermaProps)
 hook.Add("PostCleanupMap", "WhenCleanUpPermaProps", PermaProps.ReloadPermaProps) -- #MOMO
-timer.Simple(5, function() PermaProps.ReloadPermaProps() end) -- When the hook isn't call ...
 
 function PermaProps.SparksEffect( ent )
 

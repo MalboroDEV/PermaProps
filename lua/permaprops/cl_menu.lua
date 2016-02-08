@@ -63,7 +63,7 @@ local function pp_open_menu()
 	MainLabel2:SetFont("pp_font")
 	MainLabel2:SetPos(80, 100) 
 	MainLabel2:SetColor(Color(50, 50, 50, 255)) 
-	MainLabel2:SetText("There are ".. Content.MProps .." props on this map.\n\nThere are ".. Content.TProps .." props in the DB.") 
+	MainLabel2:SetText("There are ".. ( Content.MProps or 0 ) .." props on this map.\n\nThere are ".. ( Content.TProps or 0 ) .." props in the DB.") 
 	MainLabel2:SizeToContents()
 
 	local ClearMapProps = vgui.Create( "DButton", MainPanel )
