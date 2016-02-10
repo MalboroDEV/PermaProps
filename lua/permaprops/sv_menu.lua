@@ -81,7 +81,7 @@ local function pp_open_menu( ply )
 
 		end
 
-	elseif #Data_PropsList > 500 then -- Too much props dude :'(
+	elseif Data_PropsList and #Data_PropsList > 500 then -- Too much props dude :'(
 
 		for i = 1, 499 do
 			
