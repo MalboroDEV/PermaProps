@@ -148,6 +148,7 @@ function PermaProps.ReloadPermaProps()
 end
 hook.Add("InitPostEntity", "InitializePermaProps", PermaProps.ReloadPermaProps)
 hook.Add("PostCleanupMap", "WhenCleanUpPermaProps", PermaProps.ReloadPermaProps) -- #MOMO
+timer.Simple(5, function() PermaProps.ReloadPermaProps() end) -- When the hook isn't call ...
 
 function PermaProps.SparksEffect( ent )
 
