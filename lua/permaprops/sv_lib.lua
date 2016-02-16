@@ -45,6 +45,10 @@ function PermaProps.PPGetEntTable( ent )
 		content.Frozen = !ent:GetPhysicsObject():IsMoveable()
 	end
 
+	if content.Class == "prop_dynamic" then
+		content.Class = "prop_physics"
+	end
+
 	return content
 
 end
@@ -52,6 +56,10 @@ end
 function PermaProps.PPEntityFromTable( data, id )
 
 	if not id or not isnumber(id) then return false end
+
+	if data.Frozen then
+		data.Class = "prop_dynamic" -- Can reduce lags
+	end
 
 	local ent = ents.Create(data.Class)
 	if !ent then return false end

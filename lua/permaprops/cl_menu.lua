@@ -61,21 +61,37 @@ local function pp_open_menu()
 
 	local MainLabel2 = vgui.Create("DLabel", MainPanel)
 	MainLabel2:SetFont("pp_font")
-	MainLabel2:SetPos(80, 100) 
+	MainLabel2:SetPos(80, 80) 
 	MainLabel2:SetColor(Color(50, 50, 50, 255)) 
 	MainLabel2:SetText("There are ".. ( Content.MProps or 0 ) .." props on this map.\n\nThere are ".. ( Content.TProps or 0 ) .." props in the DB.") 
 	MainLabel2:SizeToContents()
 
+	local RemoveMapProps = vgui.Create( "DButton", MainPanel )
+	RemoveMapProps:SetText( " Clear map props " )
+	RemoveMapProps:SetFont("pp_font")
+	RemoveMapProps:SetSize( 370, 30)
+	RemoveMapProps:SetPos( 10, 160 )
+	RemoveMapProps:SetTextColor( Color( 50, 50, 50, 255 ) )
+	RemoveMapProps.DoClick = function()
+		net.Start("pp_info_send")
+			net.WriteTable({CMD = "CLR_MAP"})
+		net.SendToServer()
+	end
+	RemoveMapProps.Paint = function(self)
+		surface.SetDrawColor(50, 50, 50, 255)
+		surface.DrawOutlinedRect(0, 0, self:GetWide(), self:GetTall())
+	end
+
 	local ClearMapProps = vgui.Create( "DButton", MainPanel )
-	ClearMapProps:SetText( " Clear map props " )
+	ClearMapProps:SetText( " Clear map props in the DB " )
 	ClearMapProps:SetFont("pp_font")
 	ClearMapProps:SetSize( 370, 30)
 	ClearMapProps:SetPos( 10, 200 )
 	ClearMapProps:SetTextColor( Color( 50, 50, 50, 255 ) )
-	ClearMapProps.DoClick = function() 
-		net.Start("pp_info_send")
-			net.WriteTable({CMD = "DEL_MAP"})
-		net.SendToServer()
+	ClearMapProps.DoClick = function()
+
+		Derma_Query("Are you sure you want clear map props in the db ?\nYou can't undo this action !", "PermaProps 4.0", "Yes", function() net.Start("pp_info_send") net.WriteTable({CMD = "DEL_MAP"}) net.SendToServer() end, "Cancel")
+
 	end
 	ClearMapProps.Paint = function(self)
 		surface.SetDrawColor(50, 50, 50, 255)
@@ -83,15 +99,15 @@ local function pp_open_menu()
 	end
 
 	local ClearAllProps = vgui.Create( "DButton", MainPanel )
-	ClearAllProps:SetText( " Clear all props " )
+	ClearAllProps:SetText( " Clear all props in the DB " )
 	ClearAllProps:SetFont("pp_font")
 	ClearAllProps:SetSize( 370, 30)
 	ClearAllProps:SetPos( 10, 240 )
 	ClearAllProps:SetTextColor( Color( 50, 50, 50, 255 ) )
 	ClearAllProps.DoClick = function()
-		net.Start("pp_info_send")
-			net.WriteTable({CMD = "DEL_ALL"})
-		net.SendToServer()
+
+		Derma_Query("Are you sure you want clear all props in the db ?\nYou can't undo this action !", "PermaProps 4.0", "Yes", function() net.Start("pp_info_send") net.WriteTable({CMD = "DEL_ALL"}) net.SendToServer() end, "Cancel")
+
 	end
 	ClearAllProps.Paint = function(self)
 		surface.SetDrawColor(50, 50, 50, 255)
@@ -149,7 +165,7 @@ local function pp_open_menu()
 	end
 
 	local CheckBox2 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox2:SetPos( 10, 30 + 10 )
+	CheckBox2:SetPos( 10, 30 )
 	CheckBox2:SetText( "SuperAdmin can tool permaprops" )
 	CheckBox2:SetChecked( Content.ToolSA )
 	CheckBox2:SizeToContents()
@@ -163,7 +179,7 @@ local function pp_open_menu()
 	end
 
 	local CheckBox3 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox3:SetPos( 10, 50 + 20 )
+	CheckBox3:SetPos( 10, 50 )
 	CheckBox3:SetText( "Admin can Phys permaprops" )
 	CheckBox3:SetChecked( Content.PhysA )
 	CheckBox3:SizeToContents()
@@ -177,7 +193,7 @@ local function pp_open_menu()
 	end
 
 	local CheckBox4 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox4:SetPos( 10, 70 + 30)
+	CheckBox4:SetPos( 10, 70 )
 	CheckBox4:SetText( "SuperAdmin can Phys permaprops" )
 	CheckBox4:SetChecked( Content.PhysSA )
 	CheckBox4:SizeToContents()
@@ -191,7 +207,7 @@ local function pp_open_menu()
 	end
 
 	local CheckBox5 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox5:SetPos( 10, 90 + 40)
+	CheckBox5:SetPos( 10, 90 )
 	CheckBox5:SetText( "Admin can Property permaprops" )
 	CheckBox5:SetChecked( Content.PropA )
 	CheckBox5:SizeToContents()
@@ -205,7 +221,7 @@ local function pp_open_menu()
 	end
 
 	local CheckBox6 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox6:SetPos( 10, 110 + 50)
+	CheckBox6:SetPos( 10, 110 )
 	CheckBox6:SetText( "SuperAdmin can Property permaprops" )
 	CheckBox6:SetChecked( Content.PropSA )
 	CheckBox6:SizeToContents()
@@ -214,6 +230,90 @@ local function pp_open_menu()
 
 		net.Start("pp_info_send")
 			net.WriteTable({CMD = "VAR", Val = Value, Data = "PropSA"})
+		net.SendToServer()
+
+	end
+
+	local CheckBox7 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
+	CheckBox7:SetPos( 10, 130 )
+	CheckBox7:SetText( "Admin can Save permaprops" )
+	CheckBox7:SetChecked( Content.ToolSaveA )
+	CheckBox7:SizeToContents()
+	CheckBox7:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox7.OnChange = function(Self, Value)
+
+		net.Start("pp_info_send")
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolSaveA"})
+		net.SendToServer()
+
+	end
+
+	local CheckBox8 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
+	CheckBox8:SetPos( 10, 150 )
+	CheckBox8:SetText( "SuperAdmin can Save permaprops" )
+	CheckBox8:SetChecked( Content.ToolSaveSA )
+	CheckBox8:SizeToContents()
+	CheckBox8:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox8.OnChange = function(Self, Value)
+
+		net.Start("pp_info_send")
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolSaveSA"})
+		net.SendToServer()
+
+	end
+
+	local CheckBox9 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
+	CheckBox9:SetPos( 10, 170 )
+	CheckBox9:SetText( "Admin can Del permaprops" )
+	CheckBox9:SetChecked( Content.ToolDelA )
+	CheckBox9:SizeToContents()
+	CheckBox9:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox9.OnChange = function(Self, Value)
+
+		net.Start("pp_info_send")
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolDelA"})
+		net.SendToServer()
+
+	end
+
+	local CheckBox10 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
+	CheckBox10:SetPos( 10, 190 )
+	CheckBox10:SetText( "SuperAdmin can Del permaprops" )
+	CheckBox10:SetChecked( Content.ToolDelSA )
+	CheckBox10:SizeToContents()
+	CheckBox10:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox10.OnChange = function(Self, Value)
+
+		net.Start("pp_info_send")
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolDelSA"})
+		net.SendToServer()
+
+	end
+
+	local CheckBox11 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
+	CheckBox11:SetPos( 10, 210 )
+	CheckBox11:SetText( "Admin can Update permaprops" )
+	CheckBox11:SetChecked( Content.ToolUpdtA )
+	CheckBox11:SizeToContents()
+	CheckBox11:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox11.OnChange = function(Self, Value)
+
+		net.Start("pp_info_send")
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolUpdtA"})
+		net.SendToServer()
+
+	end
+
+	local CheckBox12 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
+	CheckBox12:SetPos( 10, 230 )
+	CheckBox12:SetText( "SuperAdmin can Update permaprops" )
+	CheckBox12:SetChecked( Content.ToolUpdtSA )
+	CheckBox12:SizeToContents()
+	CheckBox12:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox12.OnChange = function(Self, Value)
+
+		net.Start("pp_info_send")
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolUpdtSA"})
 		net.SendToServer()
 
 	end
@@ -289,6 +389,21 @@ local function pp_open_menu()
 
 			end )
 
+		end
+
+		if table.Count(LocalPlayer().DrawPPEnt) > 0 then
+
+			MenuButtonOptions:AddOption("Stop Drawing All", function() 
+
+				for k, v in pairs(LocalPlayer().DrawPPEnt) do
+					
+					LocalPlayer().DrawPPEnt[k]:Remove()
+					LocalPlayer().DrawPPEnt[k] = nil
+
+				end
+
+			end )
+			
 		end
 
 	    MenuButtonOptions:AddOption("Remove", function()

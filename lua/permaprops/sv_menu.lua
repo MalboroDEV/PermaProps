@@ -15,35 +15,29 @@ local function PermissionLoad()
 	if not PermaProps then PermaProps = {} end
 	if not PermaProps.Permissions then PermaProps.Permissions = {} end
 
-	if !file.Exists( "permaprops_config.txt", "DATA" )  then
-		
-		local NewData = {}
-		NewData.PhysSA = true
-		NewData.PhysA = false
-		NewData.ToolSA = true
-		NewData.ToolA = false
-		NewData.PropA = false
-		NewData.PropSA = false
+	PermaProps.Permissions["PhysSA"] = true
+	PermaProps.Permissions["PhysA"] = false
 
-		 PermaProps.Permissions["PhysSA"] = true
-		PermaProps.Permissions["PhysA"] = false
-		PermaProps.Permissions["ToolSA"] = true
-		PermaProps.Permissions["ToolA"] = false
-		PermaProps.Permissions["PropA"] = false
-		PermaProps.Permissions["PropSA"] = false
+	PermaProps.Permissions["ToolSA"] = true
+	PermaProps.Permissions["ToolA"] = false
+	
+	PermaProps.Permissions["PropA"] = false
+	PermaProps.Permissions["PropSA"] = false
 
-		file.Write( "permaprops_config.txt", util.TableToJSON(NewData) ) 
+	PermaProps.Permissions["ToolSaveA"] = true
+	PermaProps.Permissions["ToolSaveSA"] = true
 
-	else
+	PermaProps.Permissions["ToolDelA"] = true
+	PermaProps.Permissions["ToolDelSA"] = true
+
+	PermaProps.Permissions["ToolUpdtA"] = true
+	PermaProps.Permissions["ToolUpdtSA"] = true
+
+	if file.Exists( "permaprops_config.txt", "DATA" )  then
 
  		local content = file.Read( "permaprops_config.txt" )
- 		local data = util.JSONToTable( content )
- 		PermaProps.Permissions["PhysSA"] = data.PhysSA
-		PermaProps.Permissions["PhysA"] = data.PhysA
-		PermaProps.Permissions["ToolSA"] = data.ToolSA
-		PermaProps.Permissions["ToolA"] = data.ToolA
-		PermaProps.Permissions["PropA"] = data.ToolA
-		PermaProps.Permissions["PropSA"] = data.ToolA
+
+ 		table.Merge(PermaProps.Permissions, util.JSONToTable( content ))
 
 	end
 
@@ -52,15 +46,7 @@ PermissionLoad()
 
 local function PermissionSave()
 
-	local NewData = {}
-	NewData.PhysSA = PermaProps.Permissions["PhysSA"]
-	NewData.PhysA = PermaProps.Permissions["PhysA"]
-	NewData.ToolSA = PermaProps.Permissions["ToolSA"]
-	NewData.ToolA = PermaProps.Permissions["ToolA"]
-	NewData.PropA = PermaProps.Permissions["PropA"]
-	NewData.PropSA = PermaProps.Permissions["PropSA"]
-
-	file.Write( "permaprops_config.txt", util.TableToJSON(NewData) ) 
+	file.Write( "permaprops_config.txt", util.TableToJSON(PermaProps.Permissions) ) 
 
 end
 
@@ -96,12 +82,9 @@ local function pp_open_menu( ply )
 	local Content = {}
 	Content.MProps = tonumber(sql.QueryValue("SELECT COUNT(*) FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) .. ";"))
 	Content.TProps = tonumber(sql.QueryValue("SELECT COUNT(*) FROM permaprops;"))
-	Content.PhysSA = PermaProps.Permissions["PhysSA"]
-	Content.PhysA = PermaProps.Permissions["PhysA"]
-	Content.ToolSA = PermaProps.Permissions["ToolSA"]
-	Content.ToolA = PermaProps.Permissions["ToolA"]
-	Content.PropA = PermaProps.Permissions["PropA"]
-	Content.PropSA = PermaProps.Permissions["PropSA"]
+
+	table.Merge(Content, PermaProps.Permissions)
+
 	Content.PropsList = SendTable
 
 	net.Start( "pp_open_menu" )
@@ -159,6 +142,20 @@ local function pp_info_send( um, ply )
 		PermaProps.ReloadPermaProps()
 
 		ply:ChatPrint("You erased all props !")
+
+	elseif Content["CMD"] == "CLR_MAP" then
+
+		for k, v in pairs( ents.GetAll() ) do
+
+			if v.PermaProps == true then
+
+				v:Remove()
+
+			end
+
+		end
+
+		ply:ChatPrint("You have removed all props !")
 
 	end
 

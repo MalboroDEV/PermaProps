@@ -35,11 +35,17 @@ function TOOL:LeftClick(trace)
 	local ent = trace.Entity
 	local ply = self:GetOwner()
 
-	if not ply:IsAdmin() then return end
+	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
+	
+	if ply:IsAdmin() and PermaProps.Permissions["ToolSaveA"] then
+	elseif ply:IsSuperAdmin() and PermaProps.Permissions["ToolSaveSA"] then
+	else
+		return false
+	end
+
 	if not ent:IsValid() then ply:ChatPrint( "That is not a valid entity !" ) return end
 	if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
 	if ent.PermaProps then ply:ChatPrint( "That entity is already permanent !" ) return end
-	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 
 	local content = PermaProps.PPGetEntTable(ent)
 	if not content then return end
@@ -70,12 +76,18 @@ function TOOL:RightClick(trace)
 	local ent = trace.Entity
 	local ply = self:GetOwner()
 
-	if not ply:IsAdmin() then return end
+	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
+
+	if ply:IsAdmin() and PermaProps.Permissions["ToolDelA"] then
+	elseif ply:IsSuperAdmin() and PermaProps.Permissions["ToolDelSA"] then
+	else
+		return false
+	end
+
 	if not ent:IsValid() then ply:ChatPrint( "That is not a valid entity !" ) return end
 	if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
 	if not ent.PermaProps then ply:ChatPrint( "That is not a PermaProp !" ) return end
 	if not ent.PermaProps_ID then ply:ChatPrint( "ERROR: ID not found" ) return end
-	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 
 	PermaProps.SQL.Query("DELETE FROM permaprops WHERE id = ".. ent.PermaProps_ID ..";")
 
@@ -100,7 +112,12 @@ function TOOL:Reload(trace)
 		local ent = trace.Entity
 		local ply = self:GetOwner()
 
-		if not ply:IsAdmin() then return end
+		if ply:IsAdmin() and PermaProps.Permissions["ToolUpdtA"] then
+		elseif ply:IsSuperAdmin() and PermaProps.Permissions["ToolUpdtSA"] then
+		else
+			return false
+		end
+
 		if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
 		
 		local content = PermaProps.PPGetEntTable(ent)
