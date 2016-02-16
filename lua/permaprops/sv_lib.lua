@@ -57,7 +57,7 @@ function PermaProps.PPEntityFromTable( data, id )
 
 	if not id or not isnumber(id) then return false end
 
-	if data.Frozen then
+	if data.Class == "prop_physics" and data.Frozen then
 		data.Class = "prop_dynamic" -- Can reduce lags
 	end
 
