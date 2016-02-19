@@ -391,7 +391,7 @@ local function pp_open_menu()
 
 		end
 
-		if table.Count(LocalPlayer().DrawPPEnt) > 0 then
+		if LocalPlayer().DrawPPEnt and table.Count(LocalPlayer().DrawPPEnt) > 0 then
 
 			MenuButtonOptions:AddOption("Stop Drawing All", function() 
 
