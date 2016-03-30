@@ -12,11 +12,11 @@ local function PermaPropsPhys( ply, ent, phys )
 
 	if ent.PermaProps then
 
-		if ply:IsAdmin() and PermaProps.Permissions["PhysA"] then
+		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["PhysA"] then
 
 			return true
 
-		elseif ply:IsSuperAdmin() and PermaProps.Permissions["PhysSA"] then
+		elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["PhysSA"] then
 
 			return true
 
@@ -36,11 +36,11 @@ hook.Add( "CanTool", "PermaPropsPhysTool", function( ply, tr, tool )
 
 	if IsValid(tr.Entity) and tr.Entity.PermaProps and tool ~= "permaprops" then
 
-		if ply:IsAdmin() and PermaProps.Permissions["ToolA"] then -- Make another convar option if you want.
+		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolA"] then -- Make another convar option if you want.
 
 			return true
 
-		elseif ply:IsSuperAdmin() and PermaProps.Permissions["ToolSA"] then
+		elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolSA"] then
 
 			return true
 
@@ -58,11 +58,11 @@ hook.Add( "CanProperty", "PermaPropsProperty", function( ply, property, ent ) --
 
 	if IsValid(ent) and ent.PermaProps and tool ~= "permaprops" then
 
-		if ply:IsAdmin() and PermaProps.Permissions["PropA"] then -- Make another convar option if you want.
+		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["PropA"] then -- Make another convar option if you want.
 
 			return true
 
-		elseif ply:IsSuperAdmin() and PermaProps.Permissions["PropSA"] then
+		elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["PropSA"] then
 
 			return true
 
@@ -77,4 +77,4 @@ hook.Add( "CanProperty", "PermaPropsProperty", function( ply, property, ent ) --
 end)
 
 timer.Simple(5, function() hook.Remove("CanTool", "textScreensPreventTools") end) -- Fuck OFF
-timer.Simple(5, function() hook.Remove("CanTool", "textscreenpreventtools") end) -- Fuck OFF
+timer.Simple(5, function() hook.Remove("CanTool", "textscreenpreventtools") end)

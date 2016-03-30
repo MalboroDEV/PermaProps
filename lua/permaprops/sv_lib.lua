@@ -41,6 +41,22 @@ function PermaProps.PPGetEntTable( ent )
 		content.DT = ent:GetNetworkVars()
 	end
 
+	local bg = ent:GetBodyGroups()
+	if ( bg ) then
+
+		for k, v in pairs( bg ) do
+	
+			if ( ent:GetBodygroup( v.id ) > 0 ) then
+
+				content.BodyG = content.BodyG or {}
+				content.BodyG[ v.id ] = ent:GetBodygroup( v.id )
+
+			end
+	
+		end
+
+	end
+
 	if ent:GetPhysicsObject() and ent:GetPhysicsObject():IsValid() then
 		content.Frozen = !ent:GetPhysicsObject():IsMoveable()
 	end
@@ -112,6 +128,16 @@ function PermaProps.PPEntityFromTable( data, id )
 
 	end
 
+	if data.BodyG then
+
+		for k, v in pairs( data.BodyG ) do
+
+			ent:SetBodygroup( k, v )
+
+		end
+
+	end
+
 	ent.PermaProps_ID = id
 	ent.PermaProps = true
 
@@ -166,5 +192,20 @@ function PermaProps.SparksEffect( ent )
 	effectdata:SetScale(2)
 	effectdata:SetRadius(3)
 	util.Effect("Sparks", effectdata)
+
+end
+
+function PermaProps.IsAdmin( ply )
+
+    if ( ply:IsUserGroup("superadmin") or false ) then return true end
+    if ( ply:IsUserGroup("admin") or false ) then return true end
+
+    return false
+
+end
+
+function PermaProps.IsSuperAdmin( ply )
+
+	return ( ply:IsUserGroup("superadmin") or false )
 
 end

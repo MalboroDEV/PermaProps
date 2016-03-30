@@ -52,7 +52,7 @@ end
 
 local function pp_open_menu( ply )
 
-	if !ply:IsAdmin() then return end
+	if !PermaProps.IsAdmin(ply) then return end
 
 	local SendTable = {}
 	local Data_PropsList = sql.Query( "SELECT * FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) .. ";" )
@@ -98,7 +98,7 @@ local function pp_info_send( um, ply )
 
 	local Content = net.ReadTable()
 
-	if !ply:IsSuperAdmin() then ply:ChatPrint("Access denied for user") return end
+	if !PermaProps.IsSuperAdmin(ply) then ply:ChatPrint("Access denied for user") return end
 
 	if Content["CMD"] == "DEL" then
 

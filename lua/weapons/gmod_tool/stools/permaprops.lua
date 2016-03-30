@@ -37,8 +37,8 @@ function TOOL:LeftClick(trace)
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 	
-	if ply:IsAdmin() and PermaProps.Permissions["ToolSaveA"] then
-	elseif ply:IsSuperAdmin() and PermaProps.Permissions["ToolSaveSA"] then
+	if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolSaveA"] then
+	elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolSaveSA"] then
 	else
 		return false
 	end
@@ -78,8 +78,8 @@ function TOOL:RightClick(trace)
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 
-	if ply:IsAdmin() and PermaProps.Permissions["ToolDelA"] then
-	elseif ply:IsSuperAdmin() and PermaProps.Permissions["ToolDelSA"] then
+	if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolDelA"] then
+	elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolDelSA"] then
 	else
 		return false
 	end
@@ -112,8 +112,8 @@ function TOOL:Reload(trace)
 		local ent = trace.Entity
 		local ply = self:GetOwner()
 
-		if ply:IsAdmin() and PermaProps.Permissions["ToolUpdtA"] then
-		elseif ply:IsSuperAdmin() and PermaProps.Permissions["ToolUpdtSA"] then
+		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolUpdtA"] then
+		elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolUpdtSA"] then
 		else
 			return false
 		end
