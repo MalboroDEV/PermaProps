@@ -195,10 +195,24 @@ function PermaProps.SparksEffect( ent )
 
 end
 
+function PermaProps.IsUserGroup( ply, name )
+
+    if not ply:IsValid() then return false end
+    return ply:GetNetworkedString("UserGroup") == name
+
+end
+
 function PermaProps.IsAdmin( ply )
 
-    if ( ply:IsUserGroup("superadmin") or false ) then return true end
-    if ( ply:IsUserGroup("admin") or false ) then return true end
+	// Ulib FIX
+	if ucl and ucl.groups then
+		if ucl.groups[ ULib.ACCESS_ADMIN ] then
+			return ply:CheckGroup( ULib.ACCESS_ADMIN )
+		end
+	end
+
+    if ( PermaProps.IsUserGroup(ply, "superadmin") or false ) then return true end
+    if ( PermaProps.IsUserGroup(ply, "admin") or false ) then return true end
 
     return false
 
@@ -206,6 +220,13 @@ end
 
 function PermaProps.IsSuperAdmin( ply )
 
-	return ( ply:IsUserGroup("superadmin") or false )
+	// Ulib FIX
+	if ucl and ucl.groups then
+		if ucl.groups[ ULib.ACCESS_SUPERADMIN ] then
+			return ply:CheckGroup( ULib.ACCESS_SUPERADMIN )
+		end
+	end
+
+	return ( PermaProps.IsUserGroup(ply, "superadmin") or false )
 
 end
