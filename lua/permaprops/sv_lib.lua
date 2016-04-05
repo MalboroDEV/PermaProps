@@ -205,8 +205,8 @@ end
 function PermaProps.IsAdmin( ply )
 
 	// Ulib FIX
-	if ucl and ucl.groups then
-		if ucl.groups[ ULib.ACCESS_ADMIN ] then
+	if ULib and ULib.ucl and ULib.ucl.groups then
+		if ULib.ucl.groups[ ULib.ACCESS_ADMIN ] then
 			return ply:CheckGroup( ULib.ACCESS_ADMIN )
 		end
 	end
@@ -221,8 +221,8 @@ end
 function PermaProps.IsSuperAdmin( ply )
 
 	// Ulib FIX
-	if ucl and ucl.groups then
-		if ucl.groups[ ULib.ACCESS_SUPERADMIN ] then
+	if ULib and ULib.ucl and ULib.ucl.groups then
+		if ULib.ucl.groups[ ULib.ACCESS_SUPERADMIN ] then
 			return ply:CheckGroup( ULib.ACCESS_SUPERADMIN )
 		end
 	end
