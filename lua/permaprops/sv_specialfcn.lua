@@ -177,6 +177,23 @@ if list.Get( "NPC" ) and istable(list.Get( "NPC" )) then
 
 end
 
+PermaProps.SpecialENTSSpawn["item_ammo_crate"] = function( ent, data )
+
+	if data and istable(data) and data["type"] then
+
+		ent.type = data["type"]
+		ent:SetKeyValue( "AmmoType", math.Clamp( data["type"], 0, 9 ) )
+
+	end
+
+	ent:Spawn()
+	ent:Activate()
+	
+	return true
+
+end
+
+
 PermaProps.SpecialENTSSave = {}
 PermaProps.SpecialENTSSave["gmod_lamp"] = function( ent )
 
@@ -314,5 +331,15 @@ if list.Get( "NPC" ) and istable(list.Get( "NPC" )) then
 		PermaProps.SpecialENTSSave[k] = PermaProps.SpecialENTSSave["NPC"]
 
 	end
+
+end
+
+PermaProps.SpecialENTSSave["item_ammo_crate"] = function( ent )
+
+	local content = {}
+	content.Other = {}
+	content.Other["type"] = ent.type
+
+	return content
 
 end
