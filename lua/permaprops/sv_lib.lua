@@ -41,6 +41,14 @@ function PermaProps.PPGetEntTable( ent )
 		content.DT = ent:GetNetworkVars()
 	end
 
+	local sm = ent:GetMaterials()
+	for k, v in pairs( sm ) do
+			if ( ent:GetSubMaterial( k )) then
+				content.SubMat = content.SubMat or {}
+				content.SubMat[ k ] = ent:GetSubMaterial( k )
+			end
+	end
+
 	local bg = ent:GetBodyGroups()
 	if ( bg ) then
 
@@ -136,6 +144,13 @@ function PermaProps.PPEntityFromTable( data, id )
 
 		end
 
+	end
+
+
+	if data.SubMat then
+		for k, v in pairs( data.SubMat ) do
+			ent:SetSubMaterial( k, v )
+		end
 	end
 
 	ent.PermaProps_ID = id
