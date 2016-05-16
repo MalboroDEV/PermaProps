@@ -32,9 +32,15 @@ end
 hook.Add("PhysgunPickup", "PermaPropsPhys", PermaPropsPhys)
 hook.Add( "CanPlayerUnfreeze", "PermaPropsUnfreeze", PermaPropsPhys) -- Prevents people from pressing RELOAD on the physgun
 
-hook.Add( "CanTool", "PermaPropsPhysTool", function( ply, tr, tool )
+hook.Add( "CanTool", "PermaPropsTool", function( ply, tr, tool )
 
-	if IsValid(tr.Entity) and tr.Entity.PermaProps and tool ~= "permaprops" then
+	if IsValid(tr.Entity) and tr.Entity.PermaProps then
+
+		if tool == "permaprops" then
+
+			return true
+
+		end
 
 		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolA"] then -- Make another convar option if you want.
 
