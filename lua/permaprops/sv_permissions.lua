@@ -42,17 +42,25 @@ hook.Add( "CanTool", "PermaPropsTool", function( ply, tr, tool )
 
 		end
 
-		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolA"] then -- Make another convar option if you want.
+		if ULib and ULib.ucl then
 
-			return true
-
-		elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolSA"] then
-
-			return true
+			return ULib.ucl.query( ply, "permaprops_tool" )
 
 		else
 
-			return false
+			if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolA"] then -- Make another convar option if you want.
+
+				return true
+
+			elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolSA"] then
+
+				return true
+
+			else
+
+				return false
+
+			end
 
 		end
 
@@ -64,17 +72,25 @@ hook.Add( "CanProperty", "PermaPropsProperty", function( ply, property, ent ) --
 
 	if IsValid(ent) and ent.PermaProps and tool ~= "permaprops" then
 
-		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["PropA"] then -- Make another convar option if you want.
+		if ULib and ULib.ucl then
 
-			return true
-
-		elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["PropSA"] then
-
-			return true
+			return ULib.ucl.query( ply, "permaprops_property" )
 
 		else
 
-			return false
+			if PermaProps.IsAdmin(ply) and PermaProps.Permissions["PropA"] then -- Make another convar option if you want.
+
+				return true
+
+			elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["PropSA"] then
+
+				return true
+
+			else
+
+				return false
+
+			end
 
 		end
 

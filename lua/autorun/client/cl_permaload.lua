@@ -7,9 +7,28 @@
                                       |___/                                        
 */
 
-print("-------------------------------")
-print("Loading ClientSide PermaProps")
-include("permaprops/cl_menu.lua")
-include("permaprops/cl_drawent.lua")
-print("PermaProps Loaded !")
-print("-------------------------------")
+print("---------------------------------")
+print("| Loading ClientSide PermaProps |")
+print("---------------------------------")
+
+for k, v in pairs(file.Find("permaprops/cl_*.lua", "LUA")) do
+	
+	include("permaprops/".. v)
+	print("permaprops/".. v)
+
+
+end
+
+print("---------------------------------")
+print("| Loading Shared PermaProps |")
+print("---------------------------------")
+
+for k, v in pairs(file.Find("permaprops/sh_*.lua", "LUA")) do
+	
+	include("permaprops/".. v)
+	print("permaprops/".. v)
+
+
+end
+
+print("---------------------------------")

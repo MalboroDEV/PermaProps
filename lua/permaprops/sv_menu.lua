@@ -37,7 +37,7 @@ local function PermissionLoad()
 
  		local content = file.Read( "permaprops_config.txt" )
 
- 		table.Merge(PermaProps.Permissions, util.JSONToTable( content ))
+ 		table.Merge(PermaProps.Permissions, ( util.JSONToTable( content ) or {} ))
 
 	end
 

@@ -37,10 +37,20 @@ function TOOL:LeftClick(trace)
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 	
-	if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolSaveA"] then
-	elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolSaveSA"] then
+	if ULib and ULib.ucl then
+
+		print(ULib.ucl.query( ply, "permaprops_save" ))
+
+		if not ULib.ucl.query( ply, "permaprops_save" ) then return false end
+
 	else
-		return false
+
+		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolSaveA"] then
+		elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolSaveSA"] then
+		else
+			return false
+		end
+
 	end
 
 	if not ent:IsValid() then ply:ChatPrint( "That is not a valid entity !" ) return end
@@ -78,10 +88,18 @@ function TOOL:RightClick(trace)
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 
-	if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolDelA"] then
-	elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolDelSA"] then
+	if ULib and ULib.ucl then
+
+		if not ULib.ucl.query( ply, "permaprops_delete" ) then return false end
+
 	else
-		return false
+
+		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolDelA"] then
+		elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolDelSA"] then
+		else
+			return false
+		end
+
 	end
 
 	if not ent:IsValid() then ply:ChatPrint( "That is not a valid entity !" ) return end
@@ -112,10 +130,18 @@ function TOOL:Reload(trace)
 		local ent = trace.Entity
 		local ply = self:GetOwner()
 
-		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolUpdtA"] then
-		elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolUpdtSA"] then
+		if ULib and ULib.ucl then
+
+			if not ULib.ucl.query( ply, "permaprops_update" ) then return false end
+
 		else
-			return false
+
+			if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolUpdtA"] then
+			elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolUpdtSA"] then
+			else
+				return false
+			end
+
 		end
 
 		if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end

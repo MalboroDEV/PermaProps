@@ -7,15 +7,40 @@
                                       |___/                                        
 */
 
-print("-------------------------------")
-print("Loading ServerSide PermaProps")
-include("permaprops/sv_lib.lua")
-include("permaprops/sv_specialfcn.lua")
-include("permaprops/sv_sql.lua")
-include("permaprops/sv_permissions.lua")
-include("permaprops/sv_menu.lua")
-print("Loading ClientSide PermaProps")
-AddCSLuaFile("permaprops/cl_menu.lua")
-AddCSLuaFile("permaprops/cl_drawent.lua")
-print("PermaProps Loaded !")
+print("---------------------------------")
+print("| Loading ServerSide PermaProps |")
+print("---------------------------------")
+
+for k, v in pairs(file.Find("permaprops/sv_*.lua", "LUA")) do
+	
+	include("permaprops/".. v)
+	print("permaprops/".. v)
+
+
+end
+
+print("---------------------------------")
+print("| Loading Shared PermaProps |")
+print("---------------------------------")
+
+for k, v in pairs(file.Find("permaprops/sh_*.lua", "LUA")) do
+	
+	AddCSLuaFile("permaprops/".. v)
+	include("permaprops/".. v)
+	print("permaprops/".. v)
+
+
+end
+
+print("---------------------------------")
+print("| Loading ClientSide PermaProps |")
+print("---------------------------------")
+
+for k, v in pairs(file.Find("permaprops/cl_*.lua", "LUA")) do
+	
+	AddCSLuaFile("permaprops/".. v)
+	print("permaprops/".. v)
+
+end
+
 print("-------------------------------")
