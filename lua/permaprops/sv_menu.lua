@@ -33,6 +33,8 @@ local function PermissionLoad()
 	PermaProps.Permissions["ToolUpdtA"] = true
 	PermaProps.Permissions["ToolUpdtSA"] = true
 
+	PermaProps.Permissions["ULXMod"] = false
+
 	if file.Exists( "permaprops_config.txt", "DATA" )  then
 
  		local content = file.Read( "permaprops_config.txt" )

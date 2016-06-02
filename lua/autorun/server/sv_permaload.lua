@@ -7,6 +7,8 @@
                                       |___/                                        
 */
 
+if not PermaProps then PermaProps = {} end
+
 print("---------------------------------")
 print("| Loading ServerSide PermaProps |")
 print("---------------------------------")
@@ -19,9 +21,9 @@ for k, v in pairs(file.Find("permaprops/sv_*.lua", "LUA")) do
 
 end
 
-print("---------------------------------")
+print("-----------------------------")
 print("| Loading Shared PermaProps |")
-print("---------------------------------")
+print("-----------------------------")
 
 for k, v in pairs(file.Find("permaprops/sh_*.lua", "LUA")) do
 	

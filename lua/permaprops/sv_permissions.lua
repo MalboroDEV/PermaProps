@@ -42,7 +42,7 @@ hook.Add( "CanTool", "PermaPropsTool", function( ply, tr, tool )
 
 		end
 
-		if ULib and ULib.ucl then
+		if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
 
 			return ULib.ucl.query( ply, "permaprops_tool" )
 
@@ -72,7 +72,7 @@ hook.Add( "CanProperty", "PermaPropsProperty", function( ply, property, ent ) --
 
 	if IsValid(ent) and ent.PermaProps and tool ~= "permaprops" then
 
-		if ULib and ULib.ucl then
+		if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
 
 			return ULib.ucl.query( ply, "permaprops_property" )
 

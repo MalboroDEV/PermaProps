@@ -217,10 +217,10 @@ function PermaProps.SparksEffect( ent )
 
 	local effectdata = EffectData()
 	effectdata:SetOrigin(ent:GetPos())
-	effectdata:SetMagnitude(2)
+	effectdata:SetMagnitude(2.5)
 	effectdata:SetScale(2)
 	effectdata:SetRadius(3)
-	util.Effect("Sparks", effectdata)
+	util.Effect("Sparks", effectdata, true, true)
 
 end
 
@@ -233,13 +233,6 @@ end
 
 function PermaProps.IsAdmin( ply )
 
-	// Ulib FIX
-	if ULib and ULib.ucl and ULib.ucl.groups then
-		if ULib.ucl.groups[ ULib.ACCESS_ADMIN ] then
-			return ply:CheckGroup( ULib.ACCESS_ADMIN )
-		end
-	end
-
     if ( PermaProps.IsUserGroup(ply, "superadmin") or false ) then return true end
     if ( PermaProps.IsUserGroup(ply, "admin") or false ) then return true end
 
@@ -248,13 +241,6 @@ function PermaProps.IsAdmin( ply )
 end
 
 function PermaProps.IsSuperAdmin( ply )
-
-	// Ulib FIX
-	if ULib and ULib.ucl and ULib.ucl.groups then
-		if ULib.ucl.groups[ ULib.ACCESS_SUPERADMIN ] then
-			return ply:CheckGroup( ULib.ACCESS_SUPERADMIN )
-		end
-	end
 
 	return ( PermaProps.IsUserGroup(ply, "superadmin") or false )
 

@@ -318,6 +318,46 @@ local function pp_open_menu()
 
 	end
 
+	local CheckBox13 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
+	CheckBox13:SetPos( 245, 10 )
+	CheckBox13:SetText( "Enable ULX permissions" )
+	CheckBox13:SetChecked( Content.ULXMod )
+	CheckBox13:SizeToContents()
+	CheckBox13:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox13.OnChange = function(Self, Value)
+
+		net.Start("pp_info_send")
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "ULXMod"})
+		net.SendToServer()
+
+		CheckBox1:SetDisabled( Value )
+		CheckBox2:SetDisabled( Value )
+		CheckBox3:SetDisabled( Value )
+		CheckBox4:SetDisabled( Value )
+		CheckBox5:SetDisabled( Value )
+		CheckBox6:SetDisabled( Value )
+		CheckBox7:SetDisabled( Value )
+		CheckBox8:SetDisabled( Value )
+		CheckBox9:SetDisabled( Value )
+		CheckBox10:SetDisabled( Value )
+		CheckBox11:SetDisabled( Value )
+		CheckBox12:SetDisabled( Value )
+	    
+	end
+
+	CheckBox1:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox2:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox3:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox4:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox5:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox6:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox7:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox8:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox9:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox10:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox11:SetDisabled( CheckBox13:GetChecked() )
+	CheckBox12:SetDisabled( CheckBox13:GetChecked() )
+
 	local BConfig = vgui.Create("DButton", Main)
 	BConfig:SetText("Configuration")
 	BConfig:SetFont("pp_font")

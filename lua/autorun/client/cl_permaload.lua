@@ -7,6 +7,8 @@
                                       |___/                                        
 */
 
+if not PermaProps then PermaProps = {} end
+
 print("---------------------------------")
 print("| Loading ClientSide PermaProps |")
 print("---------------------------------")

@@ -30,14 +30,14 @@ end
 
 function TOOL:LeftClick(trace)
 
-	if CLIENT then return end
+	if CLIENT then return true end
 
 	local ent = trace.Entity
 	local ply = self:GetOwner()
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 	
-	if ULib and ULib.ucl then
+	if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
 
 		print(ULib.ucl.query( ply, "permaprops_save" ))
 
@@ -79,16 +79,14 @@ end
 
 function TOOL:RightClick(trace)
 
-	if CLIENT then return end
-
-	if (not trace.Entity:IsValid()) then RunConsoleCommand("pp_cfg_open") return false end
+	if CLIENT then return true end
 
 	local ent = trace.Entity
 	local ply = self:GetOwner()
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 
-	if ULib and ULib.ucl then
+	if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
 
 		if not ULib.ucl.query( ply, "permaprops_delete" ) then return false end
 
@@ -119,7 +117,7 @@ end
 
 function TOOL:Reload(trace)
 
-	if CLIENT then return end
+	if CLIENT then return true end
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 
@@ -130,7 +128,7 @@ function TOOL:Reload(trace)
 		local ent = trace.Entity
 		local ply = self:GetOwner()
 
-		if ULib and ULib.ucl then
+		if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
 
 			if not ULib.ucl.query( ply, "permaprops_update" ) then return false end
 
