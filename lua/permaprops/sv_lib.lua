@@ -169,9 +169,6 @@ function PermaProps.PPEntityFromTable( data, id )
 
 	end
 
-	ent.PermaProps_ID = id
-	ent.PermaProps = true
-
 	if data.Frozen != nil then
 		
 		local phys = ent:GetPhysicsObject()
@@ -186,6 +183,9 @@ function PermaProps.PPEntityFromTable( data, id )
 		table.Merge(ent:GetTable(), data.Table)
 
 	end
+
+	ent.PermaProps_ID = id
+	ent.PermaProps = true
 
 	return ent
 
