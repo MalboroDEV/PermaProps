@@ -284,7 +284,7 @@ function PermaProps.UselessContent( tbl )
 
 		elseif istable( v ) then
 			
-			table.Merge(tbl, SortFcn( v ))
+			SortFcn( v )
 
 		end
 		
