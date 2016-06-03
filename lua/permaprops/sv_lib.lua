@@ -81,6 +81,8 @@ function PermaProps.PPGetEntTable( ent )
 		content.Class = "prop_physics"
 	end
 
+	content.Table = PermaProps.UselessContent( ent:GetTable() )
+
 	return content
 
 end
@@ -179,6 +181,12 @@ function PermaProps.PPEntityFromTable( data, id )
 
 	end
 
+	if data.Table then
+
+		table.Merge(ent:GetTable(), data.Table)
+
+	end
+
 	return ent
 
 end
@@ -243,5 +251,45 @@ end
 function PermaProps.IsSuperAdmin( ply )
 
 	return ( PermaProps.IsUserGroup(ply, "superadmin") or false )
+
+end
+
+function PermaProps.UselessContent( tbl )
+
+	local function SortFcn( tbl2 )
+
+		for k, v in pairs( tbl2 ) do
+
+			if isfunction( v ) or isentity( v ) then
+				
+				tbl2[k] = nil
+
+			elseif istable( v ) then
+				
+				SortFcn( v )
+
+			end
+			
+		end
+
+		return tbl2
+
+	end
+
+	for k, v in pairs( tbl ) do
+
+		if isfunction( v ) or isentity( v ) then
+			
+			tbl[k] = nil
+
+		elseif istable( v ) then
+			
+			table.Merge(tbl, SortFcn( v ))
+
+		end
+		
+	end
+
+	return tbl
 
 end
