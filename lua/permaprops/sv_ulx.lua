@@ -17,6 +17,7 @@ function PermaPropsULX()
 		ULib.ucl.registerAccess( "permaprops_save", ULib.ACCESS_ADMIN, "Ability to save props", "PermaProps" )
 		ULib.ucl.registerAccess( "permaprops_delete", ULib.ACCESS_ADMIN, "Ability to delete perma props", "PermaProps" )
 		ULib.ucl.registerAccess( "permaprops_update", ULib.ACCESS_ADMIN, "Ability to update perma props", "PermaProps" )
+		ULib.ucl.registerAccess( "permaprops_menu", ULib.ACCESS_ADMIN, "Ability to open the menu", "PermaProps" )
 
 	end
 

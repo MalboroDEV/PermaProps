@@ -54,7 +54,15 @@ end
 
 local function pp_open_menu( ply )
 
-	if !PermaProps.IsAdmin(ply) then return end
+	if ULib and ULib.ucl then
+		
+		if !ULib.ucl.query( ply, "permaprops_menu" ) then return end
+		
+	else
+
+		if !PermaProps.IsAdmin(ply) then return end
+
+	end
 
 	local SendTable = {}
 	local Data_PropsList = sql.Query( "SELECT * FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) .. ";" )
