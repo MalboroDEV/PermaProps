@@ -11,13 +11,14 @@ function PermaPropsULX()
 
 	if ULib and ULib.ucl then
 
-		ULib.ucl.registerAccess( "permaprops_tool", ULib.ACCESS_ADMIN, "Ability to use tool en perma props", "PermaProps" )
+		ULib.ucl.registerAccess( "permaprops_tool", ULib.ACCESS_ADMIN, "Ability to use the tool perma props", "PermaProps" )
 		ULib.ucl.registerAccess( "permaprops_phys", ULib.ACCESS_ADMIN, "Ability to phys perma props", "PermaProps" )
 		ULib.ucl.registerAccess( "permaprops_property", ULib.ACCESS_ADMIN, "Ability to property perma props", "PermaProps" )
 		ULib.ucl.registerAccess( "permaprops_save", ULib.ACCESS_ADMIN, "Ability to save props", "PermaProps" )
 		ULib.ucl.registerAccess( "permaprops_delete", ULib.ACCESS_ADMIN, "Ability to delete perma props", "PermaProps" )
 		ULib.ucl.registerAccess( "permaprops_update", ULib.ACCESS_ADMIN, "Ability to update perma props", "PermaProps" )
 		ULib.ucl.registerAccess( "permaprops_menu", ULib.ACCESS_ADMIN, "Ability to open the menu", "PermaProps" )
+		ULib.ucl.registerAccess( "permaprops_menu_cfg", ULib.ACCESS_SUPERADMIN, "Ability to use Configuration", "PermaProps" )
 
 	end
 

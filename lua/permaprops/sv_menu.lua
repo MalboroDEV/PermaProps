@@ -108,7 +108,15 @@ local function pp_info_send( um, ply )
 
 	local Content = net.ReadTable()
 
-	if !PermaProps.IsSuperAdmin(ply) then ply:ChatPrint("Access denied for user") return end
+	if ULib and ULib.ucl then
+		
+		if !ULib.ucl.query( ply, "permaprops_menu_cfg" ) then ply:ChatPrint("Access denied for user") return end
+		
+	else
+
+		if !PermaProps.IsSuperAdmin(ply) then ply:ChatPrint("Access denied for user") return end
+
+	end
 
 	if Content["CMD"] == "DEL" then
 
