@@ -81,7 +81,7 @@ function PermaProps.PPGetEntTable( ent )
 		content.Class = "prop_physics"
 	end
 
-	content.Table = PermaProps.UselessContent( ent:GetTable() )
+	--content.Table = PermaProps.UselessContent( ent:GetTable() )
 
 	return content
 
@@ -178,11 +178,11 @@ function PermaProps.PPEntityFromTable( data, id )
 
 	end
 
-	if data.Table then
+	/*if data.Table then
 
 		table.Merge(ent:GetTable(), data.Table)
 
-	end
+	end*/
 
 	ent.PermaProps_ID = id
 	ent.PermaProps = true
