@@ -13,84 +13,13 @@ function PermaProps.PPGetEntTable( ent )
 
 	if !ent or !ent:IsValid() then return false end
 
-	local content = {}
-	content.Class = ent:GetClass()
-	content.Pos = ent:GetPos()
-	content.Angle = ent:GetAngles()
-	content.Model = ent:GetModel()
-	content.Skin = ent:GetSkin()
-	//content.Mins, content.Maxs = ent:GetCollisionBounds()
-	content.ColGroup = ent:GetCollisionGroup()
-	content.Name = ent:GetName()
-	content.ModelScale = ent:GetModelScale()
-	content.Color = ent:GetColor()
-	content.Material = ent:GetMaterial()
-	content.Solid = ent:GetSolid()
-
-	if PermaProps.SpecialENTSSave[ent:GetClass()] != nil and isfunction(PermaProps.SpecialENTSSave[ent:GetClass()]) then
-
-		local othercontent = PermaProps.SpecialENTSSave[ent:GetClass()](ent)
-		if not othercontent then return false end
-		if othercontent != nil and istable(othercontent) then
-			table.Merge(content, othercontent)
-		end
-
-	end
-
-	if ( ent.GetNetworkVars ) then
-		content.DT = ent:GetNetworkVars()
-	end
-
-	local sm = ent:GetMaterials()
-	if ( sm and istable(sm) ) then
-
-		for k, v in pairs( sm ) do
-
-			if ( ent:GetSubMaterial( k )) then
-
-				content.SubMat = content.SubMat or {}
-				content.SubMat[ k ] = ent:GetSubMaterial( k )
-
-			end
-
-		end
-
-	end
-
-	local bg = ent:GetBodyGroups()
-	if ( bg ) then
-
-		for k, v in pairs( bg ) do
-
-			if ( ent:GetBodygroup( v.id ) > 0 ) then
-
-				content.BodyG = content.BodyG or {}
-				content.BodyG[ v.id ] = ent:GetBodygroup( v.id )
-
-			end
-
-		end
-
-	end
-
-	if ent:GetPhysicsObject() and ent:GetPhysicsObject():IsValid() then
-		content.Frozen = !ent:GetPhysicsObject():IsMoveable()
-	end
-
-	if content.Class == "prop_dynamic" then
-		content.Class = "prop_physics"
-	end
-
-	--content.Table = PermaProps.UselessContent( ent:GetTable() )
-
-	return content
-
+	local content = duplicator.Copy(ent);
+	content = content.Entities[ent:EntIndex()];
+	content.DUPED = true;
+	return content;
 end
 
-function PermaProps.PPEntityFromTable( data, id )
-
-	if not id or not isnumber(id) then return false end
-
+local function OldCreate( data, id )
 	if data.Class == "prop_physics" and data.Frozen then
 		data.Class = "prop_dynamic" -- Can reduce lags
 	end
@@ -183,6 +112,22 @@ function PermaProps.PPEntityFromTable( data, id )
 		table.Merge(ent:GetTable(), data.Table)
 
 	end*/
+
+	return ent
+end
+
+function PermaProps.PPEntityFromTable( data, id )
+
+	if not id or not isnumber(id) then return false end
+
+	local ent
+
+	if data.DUPED then
+		local created = duplicator.Paste( nil, { data }, {} )
+		ent = created[1]
+	else
+		ent = OldCreate( data, id )
+	end
 
 	ent.PermaProps_ID = id
 	ent.PermaProps = true
