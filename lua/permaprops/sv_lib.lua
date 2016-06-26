@@ -1,10 +1,10 @@
 /*
-   ____          _          _   ____          __  __       _ _                     
-  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___  
- | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \ 
+   ____          _          _   ____          __  __       _ _
+  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___
+ | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \
  | |__| (_) | (_| |  __/ (_| | | |_) | |_| | | |  | | (_| | | |_) | (_) | | | (_) |
-  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/ 
-                                      |___/                                        
+  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/
+                                      |___/
 */
 
 if not PermaProps then PermaProps = {} end
@@ -13,84 +13,13 @@ function PermaProps.PPGetEntTable( ent )
 
 	if !ent or !ent:IsValid() then return false end
 
-	local content = {}
-	content.Class = ent:GetClass()
-	content.Pos = ent:GetPos()
-	content.Angle = ent:GetAngles()
-	content.Model = ent:GetModel()
-	content.Skin = ent:GetSkin()
-	//content.Mins, content.Maxs = ent:GetCollisionBounds()
-	content.ColGroup = ent:GetCollisionGroup()
-	content.Name = ent:GetName()
-	content.ModelScale = ent:GetModelScale()
-	content.Color = ent:GetColor()
-	content.Material = ent:GetMaterial()
-	content.Solid = ent:GetSolid()
-	
-	if PermaProps.SpecialENTSSave[ent:GetClass()] != nil and isfunction(PermaProps.SpecialENTSSave[ent:GetClass()]) then
-
-		local othercontent = PermaProps.SpecialENTSSave[ent:GetClass()](ent)
-		if not othercontent then return false end
-		if othercontent != nil and istable(othercontent) then
-			table.Merge(content, othercontent)
-		end
-
-	end
-
-	if ( ent.GetNetworkVars ) then
-		content.DT = ent:GetNetworkVars()
-	end
-
-	local sm = ent:GetMaterials()
-	if ( sm and istable(sm) ) then
-
-		for k, v in pairs( sm ) do
-
-			if ( ent:GetSubMaterial( k )) then
-
-				content.SubMat = content.SubMat or {}
-				content.SubMat[ k ] = ent:GetSubMaterial( k )
-
-			end
-
-		end
-
-	end
-
-	local bg = ent:GetBodyGroups()
-	if ( bg ) then
-
-		for k, v in pairs( bg ) do
-	
-			if ( ent:GetBodygroup( v.id ) > 0 ) then
-
-				content.BodyG = content.BodyG or {}
-				content.BodyG[ v.id ] = ent:GetBodygroup( v.id )
-
-			end
-	
-		end
-
-	end
-
-	if ent:GetPhysicsObject() and ent:GetPhysicsObject():IsValid() then
-		content.Frozen = !ent:GetPhysicsObject():IsMoveable()
-	end
-
-	if content.Class == "prop_dynamic" then
-		content.Class = "prop_physics"
-	end
-
-	--content.Table = PermaProps.UselessContent( ent:GetTable() )
-
-	return content
-
+	local content = duplicator.Copy(ent);
+	content = content.Entities[ent:EntIndex()];
+	content.DUPED = true;
+	return content;
 end
 
-function PermaProps.PPEntityFromTable( data, id )
-
-	if not id or not isnumber(id) then return false end
-
+local function OldCreate( data, id )
 	if data.Class == "prop_physics" and data.Frozen then
 		data.Class = "prop_dynamic" -- Can reduce lags
 	end
@@ -127,7 +56,7 @@ function PermaProps.PPEntityFromTable( data, id )
 		if data.EntityMods.material then
 			ent:SetMaterial( data.EntityMods.material["MaterialOverride"] or "")
 		end
-		
+
 		if data.EntityMods.colour then
 			ent:SetColor( data.EntityMods.colour.Color or Color(255, 255, 255, 255))
 		end
@@ -164,13 +93,13 @@ function PermaProps.PPEntityFromTable( data, id )
 			if type(k) != "number" or type(v) == "string" then continue end
 
 			ent:SetSubMaterial( k, v )
-			
+
 		end
 
 	end
 
 	if data.Frozen != nil then
-		
+
 		local phys = ent:GetPhysicsObject()
 		if phys and phys:IsValid() then
 			phys:EnableMotion(!data.Frozen)
@@ -183,6 +112,22 @@ function PermaProps.PPEntityFromTable( data, id )
 		table.Merge(ent:GetTable(), data.Table)
 
 	end*/
+
+	return ent
+end
+
+function PermaProps.PPEntityFromTable( data, id )
+
+	if not id or not isnumber(id) then return false end
+
+	local ent
+
+	if data.DUPED then
+		local created = duplicator.Paste( nil, { data }, {} )
+		ent = created[1]
+	else
+		ent = OldCreate( data, id )
+	end
 
 	ent.PermaProps_ID = id
 	ent.PermaProps = true
@@ -206,7 +151,7 @@ function PermaProps.ReloadPermaProps()
 	local content = PermaProps.SQL.Query( "SELECT * FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) .. ";" )
 
 	if not content or content == nil then return end
-	
+
 	for k, v in pairs( content ) do
 
 		local data = util.JSONToTable(v.content)
@@ -261,15 +206,15 @@ function PermaProps.UselessContent( tbl )
 		for k, v in pairs( tbl2 ) do
 
 			if isfunction( v ) or isentity( v ) then
-				
+
 				tbl2[k] = nil
 
 			elseif istable( v ) then
-				
+
 				SortFcn( v )
 
 			end
-			
+
 		end
 
 		return tbl2
@@ -279,15 +224,15 @@ function PermaProps.UselessContent( tbl )
 	for k, v in pairs( tbl ) do
 
 		if isfunction( v ) or isentity( v ) then
-			
+
 			tbl[k] = nil
 
 		elseif istable( v ) then
-			
+
 			SortFcn( v )
 
 		end
-		
+
 	end
 
 	return tbl
