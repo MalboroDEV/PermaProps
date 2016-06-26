@@ -1,10 +1,10 @@
 /*
-   ____          _          _   ____          __  __       _ _                     
-  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___  
- | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \ 
+   ____          _          _   ____          __  __       _ _
+  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___
+ | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \
  | |__| (_) | (_| |  __/ (_| | | |_) | |_| | | |  | | (_| | | |_) | (_) | | | (_) |
-  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/ 
-                                      |___/                                        
+  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/
+                                      |___/
 */
 
 if not PermaProps then PermaProps = {} end
@@ -26,7 +26,7 @@ function PermaProps.PPGetEntTable( ent )
 	content.Color = ent:GetColor()
 	content.Material = ent:GetMaterial()
 	content.Solid = ent:GetSolid()
-	
+
 	if PermaProps.SpecialENTSSave[ent:GetClass()] != nil and isfunction(PermaProps.SpecialENTSSave[ent:GetClass()]) then
 
 		local othercontent = PermaProps.SpecialENTSSave[ent:GetClass()](ent)
@@ -61,14 +61,14 @@ function PermaProps.PPGetEntTable( ent )
 	if ( bg ) then
 
 		for k, v in pairs( bg ) do
-	
+
 			if ( ent:GetBodygroup( v.id ) > 0 ) then
 
 				content.BodyG = content.BodyG or {}
 				content.BodyG[ v.id ] = ent:GetBodygroup( v.id )
 
 			end
-	
+
 		end
 
 	end
@@ -127,7 +127,7 @@ function PermaProps.PPEntityFromTable( data, id )
 		if data.EntityMods.material then
 			ent:SetMaterial( data.EntityMods.material["MaterialOverride"] or "")
 		end
-		
+
 		if data.EntityMods.colour then
 			ent:SetColor( data.EntityMods.colour.Color or Color(255, 255, 255, 255))
 		end
@@ -164,13 +164,13 @@ function PermaProps.PPEntityFromTable( data, id )
 			if type(k) != "number" or type(v) == "string" then continue end
 
 			ent:SetSubMaterial( k, v )
-			
+
 		end
 
 	end
 
 	if data.Frozen != nil then
-		
+
 		local phys = ent:GetPhysicsObject()
 		if phys and phys:IsValid() then
 			phys:EnableMotion(!data.Frozen)
@@ -206,7 +206,7 @@ function PermaProps.ReloadPermaProps()
 	local content = PermaProps.SQL.Query( "SELECT * FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) .. ";" )
 
 	if not content or content == nil then return end
-	
+
 	for k, v in pairs( content ) do
 
 		local data = util.JSONToTable(v.content)
@@ -261,15 +261,15 @@ function PermaProps.UselessContent( tbl )
 		for k, v in pairs( tbl2 ) do
 
 			if isfunction( v ) or isentity( v ) then
-				
+
 				tbl2[k] = nil
 
 			elseif istable( v ) then
-				
+
 				SortFcn( v )
 
 			end
-			
+
 		end
 
 		return tbl2
@@ -279,15 +279,15 @@ function PermaProps.UselessContent( tbl )
 	for k, v in pairs( tbl ) do
 
 		if isfunction( v ) or isentity( v ) then
-			
+
 			tbl[k] = nil
 
 		elseif istable( v ) then
-			
+
 			SortFcn( v )
 
 		end
-		
+
 	end
 
 	return tbl
