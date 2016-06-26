@@ -1,10 +1,10 @@
 /*
-   ____          _          _   ____          __  __       _ _                     
-  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___  
- | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \ 
+   ____          _          _   ____          __  __       _ _
+  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___
+ | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \
  | |__| (_) | (_| |  __/ (_| | | |_) | |_| | | |  | | (_| | | |_) | (_) | | | (_) |
-  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/ 
-                                      |___/                                        
+  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/
+                                      |___/
 */
 
 util.AddNetworkString("pp_open_menu")
@@ -20,7 +20,7 @@ local function PermissionLoad()
 
 	PermaProps.Permissions["ToolSA"] = true
 	PermaProps.Permissions["ToolA"] = false
-	
+
 	PermaProps.Permissions["PropA"] = false
 	PermaProps.Permissions["PropSA"] = false
 
@@ -48,16 +48,16 @@ PermissionLoad()
 
 local function PermissionSave()
 
-	file.Write( "permaprops_config.txt", util.TableToJSON(PermaProps.Permissions) ) 
+	file.Write( "permaprops_config.txt", util.TableToJSON(PermaProps.Permissions) )
 
 end
 
 local function pp_open_menu( ply )
 
 	if ULib and ULib.ucl then
-		
+
 		if !ULib.ucl.query( ply, "permaprops_menu" ) then return end
-		
+
 	else
 
 		if !PermaProps.IsAdmin(ply) then return end
@@ -68,7 +68,7 @@ local function pp_open_menu( ply )
 	local Data_PropsList = sql.Query( "SELECT * FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) .. ";" )
 
 	if Data_PropsList and #Data_PropsList < 500 then
-	
+
 		for k, v in pairs( Data_PropsList ) do
 
 			local data = util.JSONToTable(v.content)
@@ -80,7 +80,7 @@ local function pp_open_menu( ply )
 	elseif Data_PropsList and #Data_PropsList > 500 then -- Too much props dude :'(
 
 		for i = 1, 499 do
-			
+
 			local data = util.JSONToTable(Data_PropsList[i].content)
 
 			SendTable[Data_PropsList[i].id] = {Model = data.Model, Class = data.Class, Pos = data.Pos, Angle = data.Angle}
@@ -109,9 +109,9 @@ local function pp_info_send( um, ply )
 	local Content = net.ReadTable()
 
 	if ULib and ULib.ucl then
-		
+
 		if !ULib.ucl.query( ply, "permaprops_menu_cfg" ) then ply:ChatPrint("Access denied for user") return end
-		
+
 	else
 
 		if !PermaProps.IsSuperAdmin(ply) then ply:ChatPrint("Access denied for user") return end
@@ -127,7 +127,7 @@ local function pp_info_send( um, ply )
 		sql.Query("DELETE FROM permaprops WHERE id = ".. sql.SQLStr(Content["Val"]) .. ";")
 
 		for k, v in pairs(ents.GetAll()) do
-			
+
 			if v.PermaProps_ID == Content["Val"] then
 
 				ply:ChatPrint("You erased " .. v:GetClass() .. " with a model of " .. v:GetModel() .. " from the database.")

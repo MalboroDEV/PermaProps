@@ -1,10 +1,10 @@
 /*
-   ____          _          _   ____          __  __       _ _                     
-  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___  
- | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \ 
+   ____          _          _   ____          __  __       _ _
+  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___
+ | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \
  | |__| (_) | (_| |  __/ (_| | | |_) | |_| | | |  | | (_| | | |_) | (_) | | | (_) |
-  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/ 
-                                      |___/                                        
+  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/
+                                      |___/
 */
 
 if not PermaProps then PermaProps = {} end
@@ -66,14 +66,14 @@ PermaProps.SpecialENTSSpawn["prop_ragdoll"] = function( ent, data )
 
 	ent:Spawn()
 	ent:Activate()
-	
+
 	if data["Bones"] then
 
 		for objectid, objectdata in pairs( data["Bones"] ) do
 
 			local Phys = ent:GetPhysicsObjectNum( objectid )
 			if !IsValid( Phys ) then continue end
-		
+
 			if ( isvector( objectdata.Pos ) && isangle( objectdata.Angle ) ) then
 
 				local pos, ang = LocalToWorld( objectdata.Pos, objectdata.Angle, Vector(0, 0, 0), Angle(0, 0, 0) )
@@ -86,7 +86,7 @@ PermaProps.SpecialENTSSpawn["prop_ragdoll"] = function( ent, data )
 				end
 
 			end
-		
+
 		end
 
 	end
@@ -125,7 +125,7 @@ PermaProps.SpecialENTSSpawn["sammyservers_textscreen"] = function( ent, data )
 
 	ent:Spawn()
 	ent:Activate()
-	
+
 	if data["Lines"] then
 
 		for k, v in pairs(data["Lines"] or {}) do
@@ -153,7 +153,7 @@ PermaProps.SpecialENTSSpawn["NPC"] = function( ent, data )
 
 			if ( data["Equipment"] && data["Equipment"] != "none" && valid ) then
 				ent:SetKeyValue( "additionalequipment", data["Equipment"] )
-				ent.Equipment = data["Equipment"] 
+				ent.Equipment = data["Equipment"]
 			end
 
 		end
@@ -170,7 +170,7 @@ end
 if list.Get( "NPC" ) and istable(list.Get( "NPC" )) then
 
 	for k, v in pairs(list.Get( "NPC" )) do
-		
+
 		PermaProps.SpecialENTSSpawn[k] = PermaProps.SpecialENTSSpawn["NPC"]
 
 	end
@@ -188,7 +188,7 @@ PermaProps.SpecialENTSSpawn["item_ammo_crate"] = function( ent, data )
 
 	ent:Spawn()
 	ent:Activate()
-	
+
 	return true
 
 end
@@ -253,25 +253,25 @@ PermaProps.SpecialENTSSave["prop_ragdoll"] = function( ent )
 	end
 
 	if ( ent:HasBoneManipulations() ) then
-	
+
 		content.Other["BoneManip"] = {}
 
 		for i = 0, ent:GetBoneCount() do
-	
+
 			local t = {}
-		
+
 			local s = ent:GetManipulateBoneScale( i )
 			local a = ent:GetManipulateBoneAngles( i )
 			local p = ent:GetManipulateBonePosition( i )
-		
+
 			if ( s != Vector( 1, 1, 1 ) ) then t[ 's' ] = s end -- scale
 			if ( a != Angle( 0, 0, 0 ) ) then t[ 'a' ] = a end -- angle
 			if ( p != Vector( 0, 0, 0 ) ) then t[ 'p' ] = p end -- position
-	
+
 			if ( table.Count( t ) > 0 ) then
 				content.Other["BoneManip"][ i ] = t
 			end
-	
+
 		end
 
 	end
@@ -327,7 +327,7 @@ end
 if list.Get( "NPC" ) and istable(list.Get( "NPC" )) then
 
 	for k, v in pairs(list.Get( "NPC" )) do
-		
+
 		PermaProps.SpecialENTSSave[k] = PermaProps.SpecialENTSSave["NPC"]
 
 	end
