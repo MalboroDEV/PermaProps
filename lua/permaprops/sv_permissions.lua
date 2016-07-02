@@ -1,10 +1,10 @@
 /*
-   ____          _          _   ____          __  __       _ _                     
-  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___  
- | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \ 
+   ____          _          _   ____          __  __       _ _
+  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___
+ | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \
  | |__| (_) | (_| |  __/ (_| | | |_) | |_| | | |  | | (_| | | |_) | (_) | | | (_) |
-  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/ 
-                                      |___/                                        
+  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/
+                                      |___/
 						Thanks to ARitz Cracker for this part
 */
 
@@ -27,7 +27,7 @@ local function PermaPropsPhys( ply, ent, phys )
 		end
 
 	end
-	
+
 end
 hook.Add("PhysgunPickup", "PermaPropsPhys", PermaPropsPhys)
 hook.Add( "CanPlayerUnfreeze", "PermaPropsUnfreeze", PermaPropsPhys) -- Prevents people from pressing RELOAD on the physgun

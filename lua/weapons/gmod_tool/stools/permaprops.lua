@@ -3,10 +3,10 @@
 	Created by Entoros, June 2010
 	Facepunch: http://www.facepunch.com/member.php?u=180808
 	Modified By Malboro 28 / 12 / 2012
-	
+
 	Ideas:
 		Make permaprops cleanup-able
-		
+
 	Errors:
 		Errors on die
 
@@ -36,7 +36,7 @@ function TOOL:LeftClick(trace)
 	local ply = self:GetOwner()
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
-	
+
 	if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
 
 		print(ULib.ucl.query( ply, "permaprops_save" ))
@@ -143,7 +143,7 @@ function TOOL:Reload(trace)
 		end
 
 		if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
-		
+
 		local content = PermaProps.PPGetEntTable(ent)
 		if not content then return end
 
