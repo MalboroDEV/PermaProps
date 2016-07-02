@@ -81,7 +81,14 @@ function PermaProps.PPGetEntTable( ent )
 		content.Class = "prop_physics"
 	end
 
+	// gmod hooks
+	if ent.PreEntityCopy then ent:PreEntityCopy() end
 	--content.Table = PermaProps.UselessContent( ent:GetTable() )
+	if ent.PostEntityCopy then ent:PostEntityCopy() end
+
+	if ent.OnEntityCopyTableFinish then
+		ent:OnEntityCopyTableFinish(content)
+	end
 
 	return content
 
@@ -186,6 +193,15 @@ function PermaProps.PPEntityFromTable( data, id )
 
 	ent.PermaProps_ID = id
 	ent.PermaProps = true
+
+	// gmod hooks
+
+	if ent.OnDuplicated then
+		ent:OnDuplicated(data)
+	end
+	if ent.PostEntityPaste then
+		ent:PostEntityPaste(nil, ent, { ent } )
+	end
 
 	return ent
 
