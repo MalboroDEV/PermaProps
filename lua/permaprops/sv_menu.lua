@@ -33,7 +33,7 @@ local function PermissionLoad()
 	PermaProps.Permissions["ToolUpdtA"] = true
 	PermaProps.Permissions["ToolUpdtSA"] = true
 
-	PermaProps.Permissions["ULXMod"] = false
+	PermaProps.Permissions["ULX/SG"] = false
 
 	if file.Exists( "permaprops_config.txt", "DATA" )  then
 
@@ -57,6 +57,10 @@ local function pp_open_menu( ply )
 	if ULib and ULib.ucl then
 		
 		if !ULib.ucl.query( ply, "permaprops_menu" ) then return end
+
+	elseif serverguard then
+
+		if !serverguard.player:HasPermission(ply, "PermaProps Menu") then return end
 		
 	else
 
@@ -111,6 +115,10 @@ local function pp_info_send( um, ply )
 	if ULib and ULib.ucl then
 		
 		if !ULib.ucl.query( ply, "permaprops_menu_cfg" ) then ply:ChatPrint("Access denied for user") return end
+
+	elseif serverguard then
+
+		if !serverguard.player:HasPermission(ply, "PermaProps Menu cfg") then return end
 		
 	else
 

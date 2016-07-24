@@ -37,11 +37,13 @@ function TOOL:LeftClick(trace)
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 	
-	if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
-
-		print(ULib.ucl.query( ply, "permaprops_save" ))
+	if ULib and ULib.ucl and PermaProps.Permissions["ULX/SG"] == true then
 
 		if not ULib.ucl.query( ply, "permaprops_save" ) then return false end
+
+	elseif serverguard and PermaProps.Permissions["ULX/SG"] == true then
+
+		if not serverguard.player:HasPermission(ply, "PermaProps Save") then return false end
 
 	else
 
@@ -86,9 +88,13 @@ function TOOL:RightClick(trace)
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 
-	if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
+	if ULib and ULib.ucl and PermaProps.Permissions["ULX/SG"] == true then
 
 		if not ULib.ucl.query( ply, "permaprops_delete" ) then return false end
+
+	elseif serverguard and PermaProps.Permissions["ULX/SG"] == true then
+
+		if not serverguard.player:HasPermission(ply, "PermaProps Delete") then return false end
 
 	else
 
@@ -128,9 +134,13 @@ function TOOL:Reload(trace)
 		local ent = trace.Entity
 		local ply = self:GetOwner()
 
-		if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
+		if ULib and ULib.ucl and PermaProps.Permissions["ULX/SG"] == true then
 
 			if not ULib.ucl.query( ply, "permaprops_update" ) then return false end
+
+		elseif serverguard and PermaProps.Permissions["ULX/SG"] == true then
+
+			if not serverguard.player:HasPermission(ply, "PermaProps Update") then return false end
 
 		else
 

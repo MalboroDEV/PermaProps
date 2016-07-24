@@ -12,7 +12,15 @@ local function PermaPropsPhys( ply, ent, phys )
 
 	if ent.PermaProps then
 
-		if PermaProps.IsAdmin(ply) and PermaProps.Permissions["PhysA"] then
+		if ULib and ULib.ucl and PermaProps.Permissions["ULX/SG"] == true then
+
+			return ULib.ucl.query( ply, "permaprops_phys" )
+
+		elseif serverguard and PermaProps.Permissions["ULX/SG"] == true then
+
+			return serverguard.player:HasPermission(ply, "PermaProps Phys")
+
+		elseif PermaProps.IsAdmin(ply) and PermaProps.Permissions["PhysA"] then
 
 			return true
 
@@ -42,9 +50,13 @@ hook.Add( "CanTool", "PermaPropsTool", function( ply, tr, tool )
 
 		end
 
-		if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
+		if ULib and ULib.ucl and PermaProps.Permissions["ULX/SG"] == true then
 
 			return ULib.ucl.query( ply, "permaprops_tool" )
+
+		elseif serverguard and PermaProps.Permissions["ULX/SG"] == true then
+
+			return serverguard.player:HasPermission(ply, "PermaProps Tool")
 
 		else
 
@@ -72,9 +84,13 @@ hook.Add( "CanProperty", "PermaPropsProperty", function( ply, property, ent ) --
 
 	if IsValid(ent) and ent.PermaProps and tool ~= "permaprops" then
 
-		if ULib and ULib.ucl and PermaProps.Permissions["ULXMod"] == true then
+		if ULib and ULib.ucl and PermaProps.Permissions["ULX/SG"] == true then
 
 			return ULib.ucl.query( ply, "permaprops_property" )
+
+		elseif serverguard and PermaProps.Permissions["ULX/SG"] == true then
+
+			return serverguard.player:HasPermission(ply, "PermaProps Property")
 
 		else
 

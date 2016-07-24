@@ -319,15 +319,15 @@ local function pp_open_menu()
 	end
 
 	local CheckBox13 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox13:SetPos( 245, 10 )
-	CheckBox13:SetText( "Enable ULX permissions" )
-	CheckBox13:SetChecked( Content.ULXMod )
+	CheckBox13:SetPos( 235, 10 )
+	CheckBox13:SetText( "Enable ULX/SG permissions" )
+	CheckBox13:SetChecked( Content["ULX/SG"] )
 	CheckBox13:SizeToContents()
 	CheckBox13:SetTextColor( Color( 0, 0, 0, 255) )
 	CheckBox13.OnChange = function(Self, Value)
 
 		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "ULXMod"})
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "ULX/SG"})
 		net.SendToServer()
 
 		CheckBox1:SetDisabled( Value )
