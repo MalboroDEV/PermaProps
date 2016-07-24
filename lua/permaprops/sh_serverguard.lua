@@ -7,11 +7,15 @@
                                       |___/                                        
 */
 
-serverguard.permission:Add("PermaProps Tool")
-serverguard.permission:Add("PermaProps Phys")
-serverguard.permission:Add("PermaProps Property")
-serverguard.permission:Add("PermaProps Save")
-serverguard.permission:Add("PermaProps Delete")
-serverguard.permission:Add("PermaProps Update")
-serverguard.permission:Add("PermaProps Menu")
-serverguard.permission:Add("PermaProps Menu cfg")
+if serverguard then
+
+	serverguard.permission:Add("PermaProps Tool")
+	serverguard.permission:Add("PermaProps Phys")
+	serverguard.permission:Add("PermaProps Property")
+	serverguard.permission:Add("PermaProps Save")
+	serverguard.permission:Add("PermaProps Delete")
+	serverguard.permission:Add("PermaProps Update")
+	serverguard.permission:Add("PermaProps Menu")
+	serverguard.permission:Add("PermaProps Menu cfg")
+
+end
