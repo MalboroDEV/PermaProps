@@ -15,31 +15,42 @@ local function PermissionLoad()
 	if not PermaProps then PermaProps = {} end
 	if not PermaProps.Permissions then PermaProps.Permissions = {} end
 
-	PermaProps.Permissions["PhysSA"] = true
-	PermaProps.Permissions["PhysA"] = false
+	PermaProps.Permissions["superadmin"] = { Physgun = true, Tool = true, Property = true, Save = true, Delete = true, Update = true, Menu = true, Permissions = true, Inherits = "admin", Custom = true }
+	PermaProps.Permissions["admin"] = { Physgun = false, Tool = false, Property = false, Save = true, Delete = true, Update = true, Menu = true, Permissions = false, Inherits = "user", Custom = true }
+	PermaProps.Permissions["user"] = { Physgun = false, Tool = false, Property = false, Save = false, Delete = false, Update = false, Menu = false, Permissions = false, Inherits = "user", Custom = true }
 
-	PermaProps.Permissions["ToolSA"] = true
-	PermaProps.Permissions["ToolA"] = false
-	
-	PermaProps.Permissions["PropA"] = false
-	PermaProps.Permissions["PropSA"] = false
+	if CAMI then
 
-	PermaProps.Permissions["ToolSaveA"] = true
-	PermaProps.Permissions["ToolSaveSA"] = true
+		for k, v in pairs(CAMI.GetUsergroups()) do
 
-	PermaProps.Permissions["ToolDelA"] = true
-	PermaProps.Permissions["ToolDelSA"] = true
+			if k == "superadmin" or k == "admin" or k == "user" then continue end
 
-	PermaProps.Permissions["ToolUpdtA"] = true
-	PermaProps.Permissions["ToolUpdtSA"] = true
+			PermaProps.Permissions[k] = { Physgun = false, Tool = false, Property = false, Save = false, Delete = false, Update = false, Menu = false, Permissions = false, Inherits = v.Inherits, Custom = false }
 
-	PermaProps.Permissions["ULX/SG"] = false
+		end
+		
+	end
 
-	if file.Exists( "permaprops_config.txt", "DATA" )  then
+	if file.Exists( "permaprops_config.txt", "DATA" ) then
+ 		file.Delete( "permaprops_config.txt" )
+	end
 
- 		local content = file.Read( "permaprops_config.txt" )
+	if file.Exists( "permaprops_permissions.txt", "DATA" ) then
+ 		
+ 		local content = file.Read("permaprops_permissions.txt", "DATA")
+ 		local tablecontent = util.JSONToTable( content )
 
- 		table.Merge(PermaProps.Permissions, ( util.JSONToTable( content ) or {} ))
+ 		for k, v in pairs(tablecontent) do
+ 			
+ 			if PermaProps.Permissions[k] == nil then
+
+ 				tablecontent[k] = nil
+
+ 			end
+
+ 		end
+
+ 		table.Merge(PermaProps.Permissions, ( tablecontent or {} ))
 
 	end
 
@@ -48,30 +59,18 @@ PermissionLoad()
 
 local function PermissionSave()
 
-	file.Write( "permaprops_config.txt", util.TableToJSON(PermaProps.Permissions) ) 
+	file.Write( "permaprops_permissions.txt", util.TableToJSON(PermaProps.Permissions) ) 
 
 end
 
 local function pp_open_menu( ply )
 
-	if ULib and ULib.ucl then
-		
-		if !ULib.ucl.query( ply, "permaprops_menu" ) then return end
-
-	elseif serverguard then
-
-		if !serverguard.player:HasPermission(ply, "PermaProps Menu") then return end
-		
-	else
-
-		if !PermaProps.IsAdmin(ply) then return end
-
-	end
+	if !PermaProps.HasPermission( ply, "Menu") then ply:ChatPrint("Access denied !") return end
 
 	local SendTable = {}
 	local Data_PropsList = sql.Query( "SELECT * FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) .. ";" )
 
-	if Data_PropsList and #Data_PropsList < 500 then
+	if Data_PropsList and #Data_PropsList < 200 then
 	
 		for k, v in pairs( Data_PropsList ) do
 
@@ -81,9 +80,9 @@ local function pp_open_menu( ply )
 
 		end
 
-	elseif Data_PropsList and #Data_PropsList > 500 then -- Too much props dude :'(
+	elseif Data_PropsList and #Data_PropsList > 200 then -- Too much props dude :'(
 
-		for i = 1, 499 do
+		for i = 1, 199 do
 			
 			local data = util.JSONToTable(Data_PropsList[i].content)
 
@@ -97,12 +96,15 @@ local function pp_open_menu( ply )
 	Content.MProps = tonumber(sql.QueryValue("SELECT COUNT(*) FROM permaprops WHERE map = ".. sql.SQLStr(game.GetMap()) .. ";"))
 	Content.TProps = tonumber(sql.QueryValue("SELECT COUNT(*) FROM permaprops;"))
 
-	table.Merge(Content, PermaProps.Permissions)
-
 	Content.PropsList = SendTable
+	Content.Permissions = PermaProps.Permissions
+
+	local Data = util.TableToJSON( Content )
+	local Compressed = util.Compress( Data )
 
 	net.Start( "pp_open_menu" )
-	net.WriteTable( Content )
+	net.WriteFloat( Compressed:len() )
+	net.WriteData( Compressed, Compressed:len() )
 	net.Send( ply )
 
 end
@@ -112,19 +114,7 @@ local function pp_info_send( um, ply )
 
 	local Content = net.ReadTable()
 
-	if ULib and ULib.ucl then
-		
-		if !ULib.ucl.query( ply, "permaprops_menu_cfg" ) then ply:ChatPrint("Access denied for user") return end
-
-	elseif serverguard then
-
-		if !serverguard.player:HasPermission(ply, "PermaProps Menu cfg") then return end
-		
-	else
-
-		if !PermaProps.IsSuperAdmin(ply) then ply:ChatPrint("Access denied for user") return end
-
-	end
+	if !PermaProps.HasPermission( ply, "Menu") then ply:ChatPrint("Access denied !") return end
 
 	if Content["CMD"] == "DEL" then
 
@@ -148,10 +138,14 @@ local function pp_info_send( um, ply )
 
 	elseif Content["CMD"] == "VAR" then
 
-		if PermaProps.Permissions[Content["Data"]] == nil then return end
+		if PermaProps.Permissions[Content["Name"]] == nil or PermaProps.Permissions[Content["Name"]][Content["Data"]] == nil  then return end
 		if !isbool(Content["Val"]) then return end
 
-		PermaProps.Permissions[Content["Data"]] = Content["Val"]
+		if Content["Name"] == "superadmin" and  ( Content["Data"] == "Custom" or Content["Data"] == "Permissions" or Content["Data"] == "Menu" ) then return end
+
+		if !PermaProps.HasPermission( ply, "Permissions") then ply:ChatPrint("Access denied !") return end
+
+		PermaProps.Permissions[Content["Name"]][Content["Data"]] = Content["Val"]
 
 		PermissionSave()
 

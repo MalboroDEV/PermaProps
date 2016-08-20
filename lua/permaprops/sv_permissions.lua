@@ -8,31 +8,25 @@
 						Thanks to ARitz Cracker for this part
 */
 
+function PermaProps.HasPermission( ply, name )
+
+	if !PermaProps or !PermaProps.Permissions or !PermaProps.Permissions[ply:GetUserGroup()] then return false end
+
+	if PermaProps.Permissions[ply:GetUserGroup()].Custom == false and PermaProps.Permissions[ply:GetUserGroup()].Inherits and PermaProps.Permissions[PermaProps.Permissions[ply:GetUserGroup()].Inherits] then
+
+		return PermaProps.Permissions[PermaProps.Permissions[ply:GetUserGroup()].Inherits][name]
+
+	end
+
+	return PermaProps.Permissions[ply:GetUserGroup()][name]
+
+end
+
 local function PermaPropsPhys( ply, ent, phys )
 
 	if ent.PermaProps then
 
-		if ULib and ULib.ucl and PermaProps.Permissions["ULX/SG"] == true then
-
-			return ULib.ucl.query( ply, "permaprops_phys" )
-
-		elseif serverguard and PermaProps.Permissions["ULX/SG"] == true then
-
-			return serverguard.player:HasPermission(ply, "PermaProps Phys")
-
-		elseif PermaProps.IsAdmin(ply) and PermaProps.Permissions["PhysA"] then
-
-			return true
-
-		elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["PhysSA"] then
-
-			return true
-
-		else
-
-			return false
-
-		end
+		return PermaProps.HasPermission( ply, "Physgun")
 
 	end
 	
@@ -40,7 +34,7 @@ end
 hook.Add("PhysgunPickup", "PermaPropsPhys", PermaPropsPhys)
 hook.Add( "CanPlayerUnfreeze", "PermaPropsUnfreeze", PermaPropsPhys) -- Prevents people from pressing RELOAD on the physgun
 
-hook.Add( "CanTool", "PermaPropsTool", function( ply, tr, tool )
+local function PermaPropsTool( ply, tr, tool )
 
 	if IsValid(tr.Entity) and tr.Entity.PermaProps then
 
@@ -50,69 +44,23 @@ hook.Add( "CanTool", "PermaPropsTool", function( ply, tr, tool )
 
 		end
 
-		if ULib and ULib.ucl and PermaProps.Permissions["ULX/SG"] == true then
-
-			return ULib.ucl.query( ply, "permaprops_tool" )
-
-		elseif serverguard and PermaProps.Permissions["ULX/SG"] == true then
-
-			return serverguard.player:HasPermission(ply, "PermaProps Tool")
-
-		else
-
-			if PermaProps.IsAdmin(ply) and PermaProps.Permissions["ToolA"] then -- Make another convar option if you want.
-
-				return true
-
-			elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["ToolSA"] then
-
-				return true
-
-			else
-
-				return false
-
-			end
-
-		end
+		return PermaProps.HasPermission( ply, "Tool")
 
 	end
 
-end)
+end
+hook.Add( "CanTool", "PermaPropsTool", PermaPropsTool)
 
-hook.Add( "CanProperty", "PermaPropsProperty", function( ply, property, ent ) -- Context Menu (Right clicking on the entity)
+local function PermaPropsProperty( ply, property, ent )
 
 	if IsValid(ent) and ent.PermaProps and tool ~= "permaprops" then
 
-		if ULib and ULib.ucl and PermaProps.Permissions["ULX/SG"] == true then
-
-			return ULib.ucl.query( ply, "permaprops_property" )
-
-		elseif serverguard and PermaProps.Permissions["ULX/SG"] == true then
-
-			return serverguard.player:HasPermission(ply, "PermaProps Property")
-
-		else
-
-			if PermaProps.IsAdmin(ply) and PermaProps.Permissions["PropA"] then -- Make another convar option if you want.
-
-				return true
-
-			elseif PermaProps.IsSuperAdmin(ply) and PermaProps.Permissions["PropSA"] then
-
-				return true
-
-			else
-
-				return false
-
-			end
-
-		end
+		return PermaProps.HasPermission( ply, "Property")
 
 	end
 
-end)
+end
+hook.Add( "CanProperty", "PermaPropsProperty", PermaPropsProperty)
 
 timer.Simple(5, function() hook.Remove("CanTool", "textScreensPreventTools") end) -- Fuck OFF
 timer.Simple(5, function() hook.Remove("CanTool", "textscreenpreventtools") end)

@@ -16,7 +16,10 @@ surface.CreateFont( "pp_font", {
 
 local function pp_open_menu()
 
-	local Content = net.ReadTable()
+	local Len = net.ReadFloat()
+	local Data = net.ReadData( Len )
+	local UnCompress = util.Decompress( Data )
+	local Content = util.JSONToTable( UnCompress )
 
  	local Main = vgui.Create( "DFrame" )
 	Main:SetSize( 600, 355 )
@@ -150,213 +153,177 @@ local function pp_open_menu()
 	end
 	ConfigPanel:Hide()
 
+	local CheckCustom = vgui.Create( "DCheckBoxLabel", ConfigPanel )
+	CheckCustom:SetPos( 5, 30 )
+	CheckCustom:SetText( "Custom permissions" )
+	CheckCustom:SetValue( 0 )
+	CheckCustom:SizeToContents()
+	CheckCustom:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckCustom:SetDisabled( true )
+
+	local GroupsList = vgui.Create( "DComboBox", ConfigPanel )
+	GroupsList:SetPos( 5, 5 )
+	GroupsList:SetSize( 125, 20 )
+	GroupsList:SetValue( "Select a group..." )
+
 	local CheckBox1 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox1:SetPos( 10, 10 )
-	CheckBox1:SetText( "Admin can tool permaprops" )
-	CheckBox1:SetChecked( Content.ToolA )
+	CheckBox1:SetPos( 150, 10 )
+	CheckBox1:SetText( "Menu" )
 	CheckBox1:SizeToContents()
 	CheckBox1:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox1:SetDisabled( true )
 	CheckBox1.OnChange = function(Self, Value)
 
 		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolA"})
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "Menu", Name = GroupsList:GetValue()})
 		net.SendToServer()
-	    
+
 	end
 
 	local CheckBox2 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox2:SetPos( 10, 30 )
-	CheckBox2:SetText( "SuperAdmin can tool permaprops" )
-	CheckBox2:SetChecked( Content.ToolSA )
+	CheckBox2:SetPos( 150, 30 )
+	CheckBox2:SetText( "Edit permissions" )
 	CheckBox2:SizeToContents()
 	CheckBox2:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox2:SetDisabled( true )
 	CheckBox2.OnChange = function(Self, Value)
 
 		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolSA"})
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "Permissions", Name = GroupsList:GetValue()})
 		net.SendToServer()
-	    
+
 	end
 
 	local CheckBox3 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox3:SetPos( 10, 50 )
-	CheckBox3:SetText( "Admin can Phys permaprops" )
-	CheckBox3:SetChecked( Content.PhysA )
+	CheckBox3:SetPos( 150, 50 )
+	CheckBox3:SetText( "Physgun permaprops" )
 	CheckBox3:SizeToContents()
 	CheckBox3:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox3:SetDisabled( true )
 	CheckBox3.OnChange = function(Self, Value)
 
 		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "PhysA"})
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "Physgun", Name = GroupsList:GetValue()})
 		net.SendToServer()
-	    
+
 	end
 
 	local CheckBox4 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox4:SetPos( 10, 70 )
-	CheckBox4:SetText( "SuperAdmin can Phys permaprops" )
-	CheckBox4:SetChecked( Content.PhysSA )
+	CheckBox4:SetPos( 150, 70 )
+	CheckBox4:SetText( "Tool permaprops" )
 	CheckBox4:SizeToContents()
 	CheckBox4:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox4:SetDisabled( true )
 	CheckBox4.OnChange = function(Self, Value)
 
 		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "PhysSA"})
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "Tool", Name = GroupsList:GetValue()})
 		net.SendToServer()
 
 	end
 
 	local CheckBox5 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox5:SetPos( 10, 90 )
-	CheckBox5:SetText( "Admin can Property permaprops" )
-	CheckBox5:SetChecked( Content.PropA )
+	CheckBox5:SetPos( 150, 90 )
+	CheckBox5:SetText( "Property permaprops" )
 	CheckBox5:SizeToContents()
 	CheckBox5:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox5:SetDisabled( true )
 	CheckBox5.OnChange = function(Self, Value)
 
 		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "PropA"})
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "Property", Name = GroupsList:GetValue()})
 		net.SendToServer()
-	    
+
 	end
 
 	local CheckBox6 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox6:SetPos( 10, 110 )
-	CheckBox6:SetText( "SuperAdmin can Property permaprops" )
-	CheckBox6:SetChecked( Content.PropSA )
+	CheckBox6:SetPos( 150, 110 )
+	CheckBox6:SetText( "Save props" )
 	CheckBox6:SizeToContents()
 	CheckBox6:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox6:SetDisabled( true )
 	CheckBox6.OnChange = function(Self, Value)
 
 		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "PropSA"})
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "Save", Name = GroupsList:GetValue()})
 		net.SendToServer()
 
 	end
 
 	local CheckBox7 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox7:SetPos( 10, 130 )
-	CheckBox7:SetText( "Admin can Save permaprops" )
-	CheckBox7:SetChecked( Content.ToolSaveA )
+	CheckBox7:SetPos( 150, 130 )
+	CheckBox7:SetText( "Delete permaprops" )
 	CheckBox7:SizeToContents()
 	CheckBox7:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox7:SetDisabled( true )
 	CheckBox7.OnChange = function(Self, Value)
 
 		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolSaveA"})
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "Delete", Name = GroupsList:GetValue()})
 		net.SendToServer()
 
 	end
 
 	local CheckBox8 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox8:SetPos( 10, 150 )
-	CheckBox8:SetText( "SuperAdmin can Save permaprops" )
-	CheckBox8:SetChecked( Content.ToolSaveSA )
+	CheckBox8:SetPos( 150, 150 )
+	CheckBox8:SetText( "Update permaprops" )
 	CheckBox8:SizeToContents()
 	CheckBox8:SetTextColor( Color( 0, 0, 0, 255) )
+	CheckBox8:SetDisabled( true )
 	CheckBox8.OnChange = function(Self, Value)
 
 		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolSaveSA"})
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "Update", Name = GroupsList:GetValue()})
 		net.SendToServer()
 
 	end
 
-	local CheckBox9 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox9:SetPos( 10, 170 )
-	CheckBox9:SetText( "Admin can Del permaprops" )
-	CheckBox9:SetChecked( Content.ToolDelA )
-	CheckBox9:SizeToContents()
-	CheckBox9:SetTextColor( Color( 0, 0, 0, 255) )
-	CheckBox9.OnChange = function(Self, Value)
+	GroupsList.OnSelect = function( panel, index, value )
+		
+		CheckCustom:SetDisabled( false )
+		CheckCustom:SetChecked( Content.Permissions[value].Custom )
+
+		CheckBox1:SetDisabled( !Content.Permissions[value].Custom )
+		CheckBox1:SetChecked( Content.Permissions[value].Menu )
+		CheckBox2:SetDisabled( !Content.Permissions[value].Custom )
+		CheckBox2:SetChecked( Content.Permissions[value].Permissions )
+		CheckBox3:SetDisabled( !Content.Permissions[value].Custom )
+		CheckBox3:SetChecked( Content.Permissions[value].Physgun )
+		CheckBox4:SetDisabled( !Content.Permissions[value].Custom )
+		CheckBox4:SetChecked( Content.Permissions[value].Tool )
+		CheckBox5:SetDisabled( !Content.Permissions[value].Custom )
+		CheckBox5:SetChecked( Content.Permissions[value].Property )
+		CheckBox6:SetDisabled( !Content.Permissions[value].Custom )
+		CheckBox6:SetChecked( Content.Permissions[value].Save )
+		CheckBox7:SetDisabled( !Content.Permissions[value].Custom )
+		CheckBox7:SetChecked( Content.Permissions[value].Delete )
+		CheckBox8:SetDisabled( !Content.Permissions[value].Custom )
+		CheckBox8:SetChecked( Content.Permissions[value].Update )
+
+	end
+
+	for k, v in pairs(Content.Permissions) do
+		
+		GroupsList:AddChoice(k)
+
+	end
+
+	CheckCustom.OnChange = function(Self, Value)
+
+		CheckBox1:SetDisabled( !Value )
+		CheckBox2:SetDisabled( !Value )
+		CheckBox3:SetDisabled( !Value )
+		CheckBox4:SetDisabled( !Value )
+		CheckBox5:SetDisabled( !Value )
+		CheckBox6:SetDisabled( !Value )
+		CheckBox7:SetDisabled( !Value )
+		CheckBox8:SetDisabled( !Value )
 
 		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolDelA"})
+			net.WriteTable({CMD = "VAR", Val = Value, Data = "Custom", Name = GroupsList:GetValue()})
 		net.SendToServer()
 
 	end
-
-	local CheckBox10 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox10:SetPos( 10, 190 )
-	CheckBox10:SetText( "SuperAdmin can Del permaprops" )
-	CheckBox10:SetChecked( Content.ToolDelSA )
-	CheckBox10:SizeToContents()
-	CheckBox10:SetTextColor( Color( 0, 0, 0, 255) )
-	CheckBox10.OnChange = function(Self, Value)
-
-		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolDelSA"})
-		net.SendToServer()
-
-	end
-
-	local CheckBox11 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox11:SetPos( 10, 210 )
-	CheckBox11:SetText( "Admin can Update permaprops" )
-	CheckBox11:SetChecked( Content.ToolUpdtA )
-	CheckBox11:SizeToContents()
-	CheckBox11:SetTextColor( Color( 0, 0, 0, 255) )
-	CheckBox11.OnChange = function(Self, Value)
-
-		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolUpdtA"})
-		net.SendToServer()
-
-	end
-
-	local CheckBox12 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox12:SetPos( 10, 230 )
-	CheckBox12:SetText( "SuperAdmin can Update permaprops" )
-	CheckBox12:SetChecked( Content.ToolUpdtSA )
-	CheckBox12:SizeToContents()
-	CheckBox12:SetTextColor( Color( 0, 0, 0, 255) )
-	CheckBox12.OnChange = function(Self, Value)
-
-		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "ToolUpdtSA"})
-		net.SendToServer()
-
-	end
-
-	local CheckBox13 = vgui.Create( "DCheckBoxLabel", ConfigPanel )
-	CheckBox13:SetPos( 235, 10 )
-	CheckBox13:SetText( "Enable ULX/SG permissions" )
-	CheckBox13:SetChecked( Content["ULX/SG"] )
-	CheckBox13:SizeToContents()
-	CheckBox13:SetTextColor( Color( 0, 0, 0, 255) )
-	CheckBox13.OnChange = function(Self, Value)
-
-		net.Start("pp_info_send")
-			net.WriteTable({CMD = "VAR", Val = Value, Data = "ULX/SG"})
-		net.SendToServer()
-
-		CheckBox1:SetDisabled( Value )
-		CheckBox2:SetDisabled( Value )
-		CheckBox3:SetDisabled( Value )
-		CheckBox4:SetDisabled( Value )
-		CheckBox5:SetDisabled( Value )
-		CheckBox6:SetDisabled( Value )
-		CheckBox7:SetDisabled( Value )
-		CheckBox8:SetDisabled( Value )
-		CheckBox9:SetDisabled( Value )
-		CheckBox10:SetDisabled( Value )
-		CheckBox11:SetDisabled( Value )
-		CheckBox12:SetDisabled( Value )
-	    
-	end
-
-	CheckBox1:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox2:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox3:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox4:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox5:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox6:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox7:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox8:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox9:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox10:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox11:SetDisabled( CheckBox13:GetChecked() )
-	CheckBox12:SetDisabled( CheckBox13:GetChecked() )
 
 	local BConfig = vgui.Create("DButton", Main)
 	BConfig:SetText("Configuration")
@@ -554,6 +521,12 @@ local function pp_open_menu()
 		if PSelect then PSelect:Hide() end
 		AboutPanel:Show()
 		PSelect = AboutPanel
+
+	end
+
+	if !file.Exists("permaprops_donate.txt", "DATA") then
+		
+		Derma_Query("Please don't Forget to Donate", "PermaProps 4.0", "Donate", function() gui.OpenURL("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CJ5EUHFAQ7NLN") end, "Cancel", function() file.Write("permaprops_donate.txt") end)
 
 	end
 
