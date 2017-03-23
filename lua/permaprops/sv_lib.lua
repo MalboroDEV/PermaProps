@@ -26,6 +26,7 @@ function PermaProps.PPGetEntTable( ent )
 	content.Color = ent:GetColor()
 	content.Material = ent:GetMaterial()
 	content.Solid = ent:GetSolid()
+	content.RenderMode = ent:GetRenderMode()
 	
 	if PermaProps.SpecialENTSSave[ent:GetClass()] != nil and isfunction(PermaProps.SpecialENTSSave[ent:GetClass()]) then
 
@@ -119,7 +120,7 @@ function PermaProps.PPEntityFromTable( data, id )
 
 	end
 
-	ent:SetRenderMode( RENDERMODE_TRANSALPHA )
+	ent:SetRenderMode( data.RenderMode or RENDERMODE_NORMAL )
 	ent:SetColor( data.Color or Color(255, 255, 255, 255) )
 
 	if data.EntityMods != nil and istable(data.EntityMods) then -- OLD DATA
