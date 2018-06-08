@@ -112,9 +112,9 @@ concommand.Add("pp_cfg_open", pp_open_menu)
 
 local function pp_info_send( um, ply )
 
-	local Content = net.ReadTable()
-
 	if !PermaProps.HasPermission( ply, "Menu") then ply:ChatPrint("Access denied !") return end
+	
+	local Content = net.ReadTable()
 
 	if Content["CMD"] == "DEL" then
 
