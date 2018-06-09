@@ -93,9 +93,9 @@ function TOOL:Reload(trace)
 
 	if CLIENT then return true end
 
-	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
+	if not PermaProps then self:GetOwner():ChatPrint( "ERROR: Lib not found" ) return end
 
-	if (not trace.Entity:IsValid() and PermaProps.HasPermission( ply, "Update")) then self:GetOwner():ChatPrint( "You have reload all PermaProps !" ) PermaProps.ReloadPermaProps() return false end
+	if (not trace.Entity:IsValid() and PermaProps.HasPermission( self:GetOwner(), "Update")) then self:GetOwner():ChatPrint( "You have reload all PermaProps !" ) PermaProps.ReloadPermaProps() return false end
 
 	if trace.Entity.PermaProps then
 
