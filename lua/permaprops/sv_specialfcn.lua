@@ -130,7 +130,7 @@ PermaProps.SpecialENTSSpawn["sammyservers_textscreen"] = function( ent, data )
 
 		for k, v in pairs(data["Lines"] or {}) do
 
-			ent:SetLine(k, v.text, Color(v.color.r, v.color.g, v.color.b, v.color.a), v.size)
+			ent:SetLine(k, v.text, Color(v.color.r, v.color.g, v.color.b, v.color.a), v.size, v.font)
 
 		end
 
