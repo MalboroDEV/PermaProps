@@ -50,7 +50,7 @@ function PermaProps.PPGetEntTable( ent )
 			if ( ent:GetSubMaterial( k )) then
 
 				content.SubMat = content.SubMat or {}
-				content.SubMat[ k ] = ent:GetSubMaterial( k-1 )
+				content.SubMat[ k ] = ent:GetSubMaterial( k )
 
 			end
 
@@ -161,11 +161,10 @@ function PermaProps.PPEntityFromTable( data, id )
 	if data.SubMat then
 
 		for k, v in pairs( data.SubMat ) do
-	
-			if type(k) != "number" or type(v) == "string" then continue end 
 
-			ent:SetSubMaterial( k-1, v )
-			
+			if type(k) != "number" or type(v) == "string" then continue end
+
+			ent:SetSubMaterial( k, v )
 			
 		end
 
