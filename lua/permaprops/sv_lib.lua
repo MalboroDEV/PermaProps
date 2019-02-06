@@ -161,11 +161,10 @@ function PermaProps.PPEntityFromTable( data, id )
 	if data.SubMat then
 
 		for k, v in pairs( data.SubMat ) do
-	
-			if type(k) != "number" or type(v) == "string" then continue end 
+
+			if type(k) != "number" or type(v) != "string" then continue end
 
 			ent:SetSubMaterial( k-1, v )
-			
 			
 		end
 
