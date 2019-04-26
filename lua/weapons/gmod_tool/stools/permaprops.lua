@@ -3,10 +3,10 @@
 	Created by Entoros, June 2010
 	Facepunch: http://www.facepunch.com/member.php?u=180808
 	Modified By Malboro 28 / 12 / 2012
-	
+
 	Ideas:
 		Make permaprops cleanup-able
-		
+
 	Errors:
 		Errors on die
 
@@ -30,14 +30,23 @@ end
 
 function TOOL:LeftClick(trace)
 
-	if CLIENT then return true end
+	if CLIENT then
+    if trace.Entity:GetClass() == "sammyservers_textscreen" then
+      net.Start("PP.SammysTextscreen")
+        net.WriteEntity(trace.Entity)
+        net.WriteEntity(self:GetOwner())
+      net.SendToServer()
+      return true
+    end
+    return true
+  end
 
 	local ent = trace.Entity
 	local ply = self:GetOwner()
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
-	
-	if !PermaProps.HasPermission( ply, "Save") then return end
+
+	if not PermaProps.HasPermission( ply, "Save") then return end
 
 	if not ent:IsValid() then ply:ChatPrint( "That is not a valid entity !" ) return end
 	if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
@@ -50,12 +59,12 @@ function TOOL:LeftClick(trace)
 	if not max then max = 1 else max = max + 1 end
 
 	local new_ent = PermaProps.PPEntityFromTable(content, max)
-	if !new_ent or !new_ent:IsValid() then return end
+	if not new_ent or not new_ent:IsValid() then ply:ChatPrint("new_ent") return end
 
 	PermaProps.SparksEffect( ent )
 
-	PermaProps.SQL.Query("INSERT INTO permaprops (id, map, content) VALUES(NULL, ".. sql.SQLStr(game.GetMap()) ..", ".. sql.SQLStr(util.TableToJSON(content)) ..");")
-	ply:ChatPrint("You saved " .. ent:GetClass() .. " with model ".. ent:GetModel() .. " to the database.")
+	PermaProps.SQL.Query( "INSERT INTO permaprops (id, map, content) VALUES(NULL, " .. sql.SQLStr(game.GetMap()) .. ", " .. sql.SQLStr(util.TableToJSON(content)) .. ");")
+	ply:ChatPrint("You saved " .. ent:GetClass() .. " with model " .. ent:GetModel() .. " to the database.")
 
 	ent:Remove()
 
@@ -72,14 +81,14 @@ function TOOL:RightClick(trace)
 
 	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
 
-	if !PermaProps.HasPermission( ply, "Delete") then return end
+	if not PermaProps.HasPermission( ply, "Delete") then return end
 
 	if not ent:IsValid() then ply:ChatPrint( "That is not a valid entity !" ) return end
 	if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
 	if not ent.PermaProps then ply:ChatPrint( "That is not a PermaProp !" ) return end
 	if not ent.PermaProps_ID then ply:ChatPrint( "ERROR: ID not found" ) return end
 
-	PermaProps.SQL.Query("DELETE FROM permaprops WHERE id = ".. ent.PermaProps_ID ..";")
+	PermaProps.SQL.Query( "DELETE FROM permaprops WHERE id = " .. ent.PermaProps_ID .. ";")
 
 	ply:ChatPrint("You erased " .. ent:GetClass() .. " with a model of " .. ent:GetModel() .. " from the database.")
 
@@ -102,17 +111,17 @@ function TOOL:Reload(trace)
 		local ent = trace.Entity
 		local ply = self:GetOwner()
 
-		if !PermaProps.HasPermission( ply, "Update") then return end
+		if not PermaProps.HasPermission( ply, "Update") then return end
 
 		if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
-		
+
 		local content = PermaProps.PPGetEntTable(ent)
 		if not content then return end
 
-		PermaProps.SQL.Query("UPDATE permaprops set content = ".. sql.SQLStr(util.TableToJSON(content)) .." WHERE id = ".. ent.PermaProps_ID .." AND map = ".. sql.SQLStr(game.GetMap()) .. ";")
+		PermaProps.SQL.Query( "UPDATE permaprops set content = " .. sql.SQLStr(util.TableToJSON(content)) .. " WHERE id = " .. ent.PermaProps_ID .. " AND map = " .. sql.SQLStr(game.GetMap()) .. ";")
 
 		local new_ent = PermaProps.PPEntityFromTable(content, ent.PermaProps_ID)
-		if !new_ent or !new_ent:IsValid() then return end
+		if not new_ent or not new_ent:IsValid() then return end
 
 		PermaProps.SparksEffect( ent )
 
