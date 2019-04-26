@@ -1,10 +1,10 @@
 /*
-   ____          _          _   ____          __  __       _ _                     
-  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___  
- | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \ 
+   ____          _          _   ____          __  __       _ _
+  / ___|___   __| | ___  __| | | __ ) _   _  |  \/  | __ _| | |__   ___  _ __ ___
+ | |   / _ \ / _` |/ _ \/ _` | |  _ \| | | | | |\/| |/ _` | | '_ \ / _ \| '__/ _ \
  | |__| (_) | (_| |  __/ (_| | | |_) | |_| | | |  | | (_| | | |_) | (_) | | | (_) |
-  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/ 
-                                      |___/                                        
+  \____\___/ \__,_|\___|\__,_| |____/ \__, | |_|  |_|\__,_|_|_.__/ \___/|_|  \___/
+                                      |___/
 */
 
 surface.CreateFont( "pp_font", {
@@ -33,7 +33,7 @@ local function pp_open_menu()
 
 		draw.RoundedBox( 0, 0, 0, self:GetWide(), self:GetTall(), Color(155, 155, 155, 220) )
 		surface.SetDrawColor( 17, 148, 240, 255 )
-		surface.DrawOutlinedRect( 0, 0, self:GetWide(), self:GetTall() )	
+		surface.DrawOutlinedRect( 0, 0, self:GetWide(), self:GetTall() )
 
 		draw.RoundedBox( 0, 0, 0, self:GetWide(), 25, Color(17, 148, 240, 200) )
 		surface.SetDrawColor( 17, 148, 240, 255 )
@@ -49,7 +49,7 @@ local function pp_open_menu()
 	MainPanel:SetPos( 190, 51 )
 	MainPanel:SetSize( 390, 275 )
 	MainPanel.Paint = function( self )
-		surface.SetDrawColor( 50, 50, 50, 200 ) 
+		surface.SetDrawColor( 50, 50, 50, 200 )
 		surface.DrawRect( 0, 0, self:GetWide(), self:GetTall() )
 		surface.DrawOutlinedRect(0, 15, self:GetWide(), 40)
 	end
@@ -57,16 +57,16 @@ local function pp_open_menu()
 
 	local MainLabel = vgui.Create("DLabel", MainPanel)
 	MainLabel:SetFont("pp_font")
-	MainLabel:SetPos(140, 25) 
-	MainLabel:SetColor(Color(50, 50, 50, 255)) 
-	MainLabel:SetText("Hey ".. LocalPlayer():Nick() .." !") 
+	MainLabel:SetPos(140, 25)
+	MainLabel:SetColor(Color(50, 50, 50, 255))
+	MainLabel:SetText("Hey ".. LocalPlayer():Nick() .." !")
 	MainLabel:SizeToContents()
 
 	local MainLabel2 = vgui.Create("DLabel", MainPanel)
 	MainLabel2:SetFont("pp_font")
-	MainLabel2:SetPos(80, 80) 
-	MainLabel2:SetColor(Color(50, 50, 50, 255)) 
-	MainLabel2:SetText("There are ".. ( Content.MProps or 0 ) .." props on this map.\n\nThere are ".. ( Content.TProps or 0 ) .." props in the DB.") 
+	MainLabel2:SetPos(80, 80)
+	MainLabel2:SetColor(Color(50, 50, 50, 255))
+	MainLabel2:SetText("There are ".. ( Content.MProps or 0 ) .." props on this map.\n\nThere are ".. ( Content.TProps or 0 ) .." props in the DB.")
 	MainLabel2:SizeToContents()
 
 	local RemoveMapProps = vgui.Create( "DButton", MainPanel )
@@ -148,7 +148,7 @@ local function pp_open_menu()
 	ConfigPanel:SetPos( 190, 51 )
 	ConfigPanel:SetSize( 390, 275 )
 	ConfigPanel.Paint = function( self )
-		surface.SetDrawColor( 50, 50, 50, 200 ) 
+		surface.SetDrawColor( 50, 50, 50, 200 )
 		surface.DrawRect( 0, 0, self:GetWide(), self:GetTall() )
 	end
 	ConfigPanel:Hide()
@@ -279,7 +279,7 @@ local function pp_open_menu()
 	end
 
 	GroupsList.OnSelect = function( panel, index, value )
-		
+
 		CheckCustom:SetDisabled( false )
 		CheckCustom:SetChecked( Content.Permissions[value].Custom )
 
@@ -303,7 +303,7 @@ local function pp_open_menu()
 	end
 
 	for k, v in pairs(Content.Permissions) do
-		
+
 		GroupsList:AddChoice(k)
 
 	end
@@ -353,7 +353,7 @@ local function pp_open_menu()
 	PropsPanel:SetPos( 190, 51 )
 	PropsPanel:SetSize( 390, 275 )
 	PropsPanel.Paint = function( self )
-		surface.SetDrawColor( 50, 50, 50, 200 ) 
+		surface.SetDrawColor( 50, 50, 50, 200 )
 		surface.DrawRect( 0, 0, self:GetWide(), self:GetTall() )
 	end
 	PropsPanel:Hide()
@@ -373,13 +373,13 @@ local function pp_open_menu()
 	PropsList.OnRowRightClick = function(panel, line)
 
 		local MenuButtonOptions = DermaMenu()
-	    MenuButtonOptions:AddOption("Draw entity", function() 
+	    MenuButtonOptions:AddOption("Draw entity", function()
 
 	    	if not LocalPlayer().DrawPPEnt or not istable(LocalPlayer().DrawPPEnt) then LocalPlayer().DrawPPEnt = {} end
 
 	    	if LocalPlayer().DrawPPEnt[PropsList:GetLine(line):GetValue(1)] and LocalPlayer().DrawPPEnt[PropsList:GetLine(line):GetValue(1)]:IsValid() then return end
 
-		    local ent = ents.CreateClientProp( Content.PropsList[PropsList:GetLine(line):GetValue(1)].Model ) 
+		    local ent = ents.CreateClientProp( Content.PropsList[PropsList:GetLine(line):GetValue(1)].Model )
 			ent:SetPos( Content.PropsList[PropsList:GetLine(line):GetValue(1)].Pos )
 			ent:SetAngles( Content.PropsList[PropsList:GetLine(line):GetValue(1)].Angle )
 
@@ -388,8 +388,8 @@ local function pp_open_menu()
 		end )
 
 		if LocalPlayer().DrawPPEnt and LocalPlayer().DrawPPEnt[PropsList:GetLine(line):GetValue(1)] then
-			
-			MenuButtonOptions:AddOption("Stop Drawing", function() 
+
+			MenuButtonOptions:AddOption("Stop Drawing", function()
 
 				LocalPlayer().DrawPPEnt[PropsList:GetLine(line):GetValue(1)]:Remove()
 				LocalPlayer().DrawPPEnt[PropsList:GetLine(line):GetValue(1)] = nil
@@ -400,17 +400,17 @@ local function pp_open_menu()
 
 		if LocalPlayer().DrawPPEnt != nil and istable(LocalPlayer().DrawPPEnt) and table.Count(LocalPlayer().DrawPPEnt) > 0 then
 
-			MenuButtonOptions:AddOption("Stop Drawing All", function() 
+			MenuButtonOptions:AddOption("Stop Drawing All", function()
 
 				for k, v in pairs(LocalPlayer().DrawPPEnt) do
-					
+
 					LocalPlayer().DrawPPEnt[k]:Remove()
 					LocalPlayer().DrawPPEnt[k] = nil
 
 				end
 
 			end )
-			
+
 		end
 
 	    MenuButtonOptions:AddOption("Remove", function()
@@ -423,7 +423,7 @@ local function pp_open_menu()
 
 	    		LocalPlayer().DrawPPEnt[PropsList:GetLine(line):GetValue(1)]:Remove()
 				LocalPlayer().DrawPPEnt[PropsList:GetLine(line):GetValue(1)] = nil
-				
+
 	    	end
 
 	    	PropsList:RemoveLine(line)
@@ -431,11 +431,11 @@ local function pp_open_menu()
 
 		end )
 	    MenuButtonOptions:Open()
-		
+
 	end
 
 	for k, v in pairs(Content.PropsList) do
-		
+
 		PropsList:AddLine(k, v.Class, v.Model)
 
 	end
@@ -468,7 +468,7 @@ local function pp_open_menu()
 	AboutPanel:SetPos( 190, 51 )
 	AboutPanel:SetSize( 390, 275 )
 	AboutPanel.Paint = function( self )
-		surface.SetDrawColor( 50, 50, 50, 200 ) 
+		surface.SetDrawColor( 50, 50, 50, 200 )
 		surface.DrawRect( 0, 0, self:GetWide(), self:GetTall() )
 		surface.DrawOutlinedRect(0, 15, self:GetWide(), 40)
 	end
@@ -476,16 +476,16 @@ local function pp_open_menu()
 
 	local AboutLabel = vgui.Create("DLabel", AboutPanel)
 	AboutLabel:SetFont("pp_font")
-	AboutLabel:SetPos(140, 25) 
-	AboutLabel:SetColor(Color(50, 50, 50, 255)) 
-	AboutLabel:SetText("PermaProps 4.0") 
+	AboutLabel:SetPos(140, 25)
+	AboutLabel:SetColor(Color(50, 50, 50, 255))
+	AboutLabel:SetText("PermaProps 4.0")
 	AboutLabel:SizeToContents()
 
 	local AboutLabel2 = vgui.Create("DLabel", AboutPanel)
 	AboutLabel2:SetFont("pp_font")
-	AboutLabel2:SetPos(30, 80) 
-	AboutLabel2:SetColor(Color(50, 50, 50, 255)) 
-	AboutLabel2:SetText("Author:              Malboro\n\nContributor:      Entoros | ARitz Cracker\n\n\n           Special thanks to all donors !") 
+	AboutLabel2:SetPos(30, 80)
+	AboutLabel2:SetColor(Color(50, 50, 50, 255))
+	AboutLabel2:SetText("Author:              Malboro\n\nContributor:      Entoros | ARitz Cracker\n\n\n           Special thanks to all donors !")
 	AboutLabel2:SizeToContents()
 
 	local DonationsTxT = vgui.Create( "DButton", AboutPanel )
@@ -513,7 +513,7 @@ local function pp_open_menu()
 		surface.DrawOutlinedRect(0, 0, self:GetWide(), self:GetTall())
 	end
 	BAbout.DoClick = function( self )
-	
+
 		if BSelect then BSelect.PaintColor = Color(0, 0, 0, 0) end
 		BSelect = self
 		self.PaintColor = Color(17, 148, 240, 100)
@@ -524,9 +524,9 @@ local function pp_open_menu()
 
 	end
 
-	if !file.Exists("permaprops_donate.txt", "DATA") then
-		
-		Derma_Query("Please don't Forget to Donate", "PermaProps 4.0", "Donate", function() gui.OpenURL("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CJ5EUHFAQ7NLN") end, "Cancel", function() file.Write("permaprops_donate.txt") end)
+	if not file.Exists("permaprops_donate.txt", "DATA") then
+
+		Derma_Query("Please don't Forget to Donate", "PermaProps 4.0", "Donate", function() gui.OpenURL("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CJ5EUHFAQ7NLN") end, "Cancel", function() file.Write("permaprops_donate.txt", "") end)
 
 	end
 
