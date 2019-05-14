@@ -8,6 +8,7 @@
 						Thanks to ARitz Cracker for this part
 */
 
+-- Maybe make this shared?
 function PermaProps.HasPermission( ply, name )
 
 	if !PermaProps or !PermaProps.Permissions or !PermaProps.Permissions[ply:GetUserGroup()] then return false end

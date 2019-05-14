@@ -188,7 +188,7 @@ function PermaProps.PPEntityFromTable( data, id )
 	ent.PermaProps_ID = id
 	ent.PermaProps = true
 	
-	// For all idiots who don't know how to config FPP, FUCK YOU
+	-- For all idiots who don't know how to config FPP, FUCK YOU
 	function ent:CanTool( ply, trace, tool )
 
 		if IsValid(trace.Entity) and trace.Entity.PermaProps then

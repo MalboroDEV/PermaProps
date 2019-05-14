@@ -532,3 +532,51 @@ local function pp_open_menu()
 
 end
 net.Receive("pp_open_menu", pp_open_menu)
+
+properties.Add( "ppoptions", {
+	MenuLabel = "PP Options", -- Name to display on the context menu
+	Order = 2000, -- The order to display this property relative to other properties
+	MenuIcon = "icon16/bin_closed.png", -- The icon to display next to the property
+
+	Filter = function( self, ent, ply ) -- A function that determines whether an entity is valid for this property
+		if not ply:IsAdmin() then return false end
+		if not IsValid(ent) then return false end
+		if not ent:GetClass() then return false end
+		if ent:EntIndex() < 0 then return false end
+
+		return true
+	end,
+	MenuOpen = function( self, option, ent, tr )
+		local submenu = option:AddSubMenu()
+		local function addoption( str, data )
+			local menu = submenu:AddOption( str, data.callback )
+
+			if data.icon then
+				menu:SetImage( data.icon )
+			end
+
+			return menu
+		end
+
+		addoption( "Permaprop this entity", {
+			icon = "icon16/tick.png",
+			callback = function()
+			net.Start("PP.ClientSideCreated")
+				net.WriteEntity(ent)
+			net.SendToServer()
+			end,
+		})
+
+		addoption( "Remove Permaprop from this entity", {
+			icon = "icon16/cross.png",
+			callback = function()
+			net.Start("PP.ClientSideDeleted")
+				net.WriteEntity(ent)
+			net.SendToServer()
+			end,
+		})
+
+
+	end,
+	Action = function( self, ent ) end,
+})

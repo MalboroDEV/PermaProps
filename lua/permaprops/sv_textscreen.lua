@@ -1,7 +1,9 @@
-util.AddNetworkString( "PP.SammysTextscreen" )
-net.Receive("PP.SammysTextscreen", function(len, ply)
-  ent = net.ReadEntity()
-  ply = net.ReadEntity()
+util.AddNetworkString( "PP.ClientSideCreated" ) -- Sorry not named very well, client side tried to perma prop
+util.AddNetworkString( "PP.ClientSideDeleted" ) -- Client side tryed to delete a permaprop.
+
+net.Receive("PP.ClientSideCreated", function(len, ply)
+
+  local ent = net.ReadEntity()
 
   if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
   if not PermaProps.HasPermission( ply, "Save") then return end
@@ -30,4 +32,27 @@ net.Receive("PP.SammysTextscreen", function(len, ply)
 
   return true
 
+end)
+
+net.Receive("PP.ClientSideDeleted", function(len, ply)
+
+	local ent = net.ReadEntity()
+
+	if not PermaProps then ply:ChatPrint( "ERROR: Lib not found" ) return end
+
+	if not PermaProps.HasPermission( ply, "Delete") then return end
+
+	if not ent:IsValid() then ply:ChatPrint( "That is not a valid entity !" ) return end
+	if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
+	if not ent.PermaProps then ply:ChatPrint( "That is not a PermaProp !" ) return end
+	if not ent.PermaProps_ID then ply:ChatPrint( "ERROR: ID not found" ) return end
+
+	PermaProps.SQL.Query( "DELETE FROM permaprops WHERE id = " .. ent.PermaProps_ID .. ";")
+
+	ply:ChatPrint("You erased " .. ent:GetClass() .. " with a model of " .. ent:GetModel() .. " from the database.")
+
+	ent:Remove()
+
+  return true
+  
 end)

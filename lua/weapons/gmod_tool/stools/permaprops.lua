@@ -14,6 +14,11 @@
 		By Malboro the 28/12/2012
 */
 
+local function clientHasPermission (ply, name)
+	local hasPermission = hook.Run("PP.HasPermission", ply, name)
+	print(hasPermission)
+end
+
 TOOL.Category		=	"Props Tool"
 TOOL.Name			=	"PermaProps"
 TOOL.Command		=	nil
@@ -31,10 +36,9 @@ end
 function TOOL:LeftClick(trace)
 
 	if CLIENT then
-    if trace.Entity:GetClass() == "sammyservers_textscreen" then
-      net.Start("PP.SammysTextscreen")
+    if IsValid(trace.Entity) and trace.Entity:GetClass() == "sammyservers_textscreen" and clientHasPermission(LocalPlayer(), "Save") then
+      net.Start("PP.ClientSideCreated")
         net.WriteEntity(trace.Entity)
-        net.WriteEntity(self:GetOwner())
       net.SendToServer()
       return true
     end
@@ -102,9 +106,9 @@ function TOOL:Reload(trace)
 
 	if CLIENT then return true end
 
-	if not PermaProps then self:GetOwner():ChatPrint( "ERROR: Lib not found" ) return end
+	if not PermaProps then trace.Entity:GetOwner():ChatPrint( "ERROR: Lib not found" ) return end
 
-	if (not trace.Entity:IsValid() and PermaProps.HasPermission( self:GetOwner(), "Update")) then self:GetOwner():ChatPrint( "You have reload all PermaProps !" ) PermaProps.ReloadPermaProps() return false end
+	if (not trace.Entity:IsValid() and PermaProps.HasPermission( trace.Entity:GetOwner(), "Update")) then self:GetOwner():ChatPrint( "You have reload all PermaProps !" ) PermaProps.ReloadPermaProps() return false end
 
 	if trace.Entity.PermaProps then
 
