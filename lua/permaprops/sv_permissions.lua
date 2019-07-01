@@ -50,7 +50,7 @@ local function PermaPropsTool( ply, tr, tool )
 
 		end
 
-		if trace.Entity:GetClass() == "sammyservers_textscreen" and tool == "permaprops" then -- Let people use PermaProps on textscreen
+		if tr.Entity:GetClass() == "sammyservers_textscreen" and tool == "permaprops" then -- Let people use PermaProps on textscreen
 			
 			return true
 
