@@ -36,15 +36,25 @@ hook.Add( "CanPlayerUnfreeze", "PermaPropsUnfreeze", PermaPropsPhys) -- Prevents
 
 local function PermaPropsTool( ply, tr, tool )
 
-	if IsValid(tr.Entity) and tr.Entity.PermaProps then
+	if IsValid(tr.Entity) then
 
-		if tool == "permaprops" then
+		if tr.Entity.PermaProps then
 
-			return true
+			if tool == "permaprops" then
+
+				return true
+
+			end
+
+			return PermaProps.HasPermission( ply, "Tool")
 
 		end
 
-		return PermaProps.HasPermission( ply, "Tool")
+		if trace.Entity:GetClass() == "sammyservers_textscreen" and tool == "permaprops" then -- Let people use PermaProps on textscreen
+			
+			return true
+
+		end
 
 	end
 
@@ -61,6 +71,3 @@ local function PermaPropsProperty( ply, property, ent )
 
 end
 hook.Add( "CanProperty", "PermaPropsProperty", PermaPropsProperty)
-
-timer.Simple(5, function() hook.Remove("CanTool", "textScreensPreventTools") end) -- Fuck OFF
-timer.Simple(5, function() hook.Remove("CanTool", "textscreenpreventtools") end)
