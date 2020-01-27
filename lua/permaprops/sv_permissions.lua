@@ -71,6 +71,3 @@ local function PermaPropsProperty( ply, property, ent )
 
 end
 hook.Add( "CanProperty", "PermaPropsProperty", PermaPropsProperty)
-
-timer.Simple(5, function() hook.Remove("CanTool", "textScreensPreventTools") end) -- Fuck OFF
-timer.Simple(5, function() hook.Remove("CanTool", "textscreenpreventtools") end)
