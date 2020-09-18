@@ -100,16 +100,7 @@ function PermaProps.PPEntityFromTable( data, id )
 	local ent = ents.Create(data.Class)
 	if !ent then return false end
 	if !ent:IsVehicle() then if !ent:IsValid() then return false end end
-	--ent:SetPos( data.Pos or Vector(0, 0, 0) ) Set pos should be done after prop is spawned.
-	ent:SetAngles( data.Angle or Angle(0, 0, 0) )
-	ent:SetModel( data.Model or "models/error.mdl" )
-	ent:SetSkin( data.Skin or 0 )
-	//ent:SetCollisionBounds( ( data.Mins or 0 ), ( data.Maxs or 0 ) )
-	ent:SetCollisionGroup( data.ColGroup or 0 )
-	ent:SetName( data.Name or "" )
-	ent:SetModelScale( data.ModelScale or 1 )
-	ent:SetMaterial( data.Material or "" )
-	ent:SetSolid( data.Solid or 6 )
+	-- Properties better be called whenever entity is spawned.
 
 	if PermaProps.SpecialENTSSpawn[data.Class] != nil and isfunction(PermaProps.SpecialENTSSpawn[data.Class]) then
 
@@ -121,9 +112,20 @@ function PermaProps.PPEntityFromTable( data, id )
 
 	end
 
-	-- Some entities may call SetPos during their Initialization.
-	-- It is best to call SetPos after the prop has been spawned and initialized.
+	-- Some entities may change their properties during their Initialization.
+	-- It is best to change properties such as skin after spawning an entity.
 	ent:SetPos( data.Pos or Vector(0, 0, 0) )
+	ent:SetAngles( data.Angle or Angle(0, 0, 0) )
+	ent:SetModel( data.Model or "models/error.mdl" )
+	ent:SetSkin( data.Skin or 0 )
+	//ent:SetCollisionBounds( ( data.Mins or 0 ), ( data.Maxs or 0 ) )
+	ent:SetCollisionGroup( data.ColGroup or 0 )
+	ent:SetName( data.Name or "" )
+	ent:SetModelScale( data.ModelScale or 1 )
+	ent:SetMaterial( data.Material or "" )
+	ent:SetSolid( data.Solid or 6 )
+	
+
 	ent:SetRenderMode( data.RenderMode or RENDERMODE_NORMAL )
 	ent:SetColor( data.Color or Color(255, 255, 255, 255) )
 
