@@ -100,7 +100,7 @@ function PermaProps.PPEntityFromTable( data, id )
 	local ent = ents.Create(data.Class)
 	if !ent then return false end
 	if !ent:IsVehicle() then if !ent:IsValid() then return false end end
-	ent:SetPos( data.Pos or Vector(0, 0, 0) )
+	--ent:SetPos( data.Pos or Vector(0, 0, 0) ) Set pos should be done after prop is spawned.
 	ent:SetAngles( data.Angle or Angle(0, 0, 0) )
 	ent:SetModel( data.Model or "models/error.mdl" )
 	ent:SetSkin( data.Skin or 0 )
@@ -121,6 +121,9 @@ function PermaProps.PPEntityFromTable( data, id )
 
 	end
 
+	-- Some entities may call SetPos during their Initialization.
+	-- It is best to call SetPos after the prop has been spawned and initialized.
+	ent:SetPos( data.Pos or Vector(0, 0, 0) )
 	ent:SetRenderMode( data.RenderMode or RENDERMODE_NORMAL )
 	ent:SetColor( data.Color or Color(255, 255, 255, 255) )
 
