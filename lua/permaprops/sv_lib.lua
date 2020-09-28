@@ -102,6 +102,9 @@ function PermaProps.PPEntityFromTable( data, id )
 	if !ent:IsVehicle() then if !ent:IsValid() then return false end end
 	-- Properties better be called whenever entity is spawned.
 
+	ent:SetModel( data.Model or "models/error.mdl" )
+	ent:SetName( data.Name or "" )
+
 	if PermaProps.SpecialENTSSpawn[data.Class] != nil and isfunction(PermaProps.SpecialENTSSpawn[data.Class]) then
 
 		PermaProps.SpecialENTSSpawn[data.Class](ent, data.Other)
@@ -116,11 +119,11 @@ function PermaProps.PPEntityFromTable( data, id )
 	-- It is best to change properties such as skin after spawning an entity.
 	ent:SetPos( data.Pos or Vector(0, 0, 0) )
 	ent:SetAngles( data.Angle or Angle(0, 0, 0) )
-	ent:SetModel( data.Model or "models/error.mdl" )
+	
 	ent:SetSkin( data.Skin or 0 )
 	//ent:SetCollisionBounds( ( data.Mins or 0 ), ( data.Maxs or 0 ) )
 	ent:SetCollisionGroup( data.ColGroup or 0 )
-	ent:SetName( data.Name or "" )
+	
 	ent:SetModelScale( data.ModelScale or 1 )
 	ent:SetMaterial( data.Material or "" )
 	ent:SetSolid( data.Solid or 6 )
