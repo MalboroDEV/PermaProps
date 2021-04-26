@@ -55,7 +55,9 @@ local function PermissionLoad()
 	end
 
 end
-PermissionLoad()
+
+hook.Add("Initialize", "PermaPropPermLoad", PermissionLoad)
+hook.Add("CAMI.OnUsergroupRegistered", "PermaPropPermLoadCAMI", PermissionLoad) -- In case something changes
 
 local function PermissionSave()
 
