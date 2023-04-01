@@ -38,6 +38,13 @@ function PermaProps.PPGetEntTable( ent )
 
 	end
 
+	do
+		local othercontent = hook.Run("PermaProps.AddData", ent)
+		if othercontent and istable(othercontent) then
+			table.Merge(content, othercontent)
+		end
+	end
+
 	if ( ent.GetNetworkVars ) then
 		content.DT = ent:GetNetworkVars()
 	end
@@ -120,6 +127,8 @@ function PermaProps.PPEntityFromTable( data, id )
 		ent:Spawn()
 
 	end
+
+	hook.Run("PermaProps.ApplyData", ent, data)
 
 	ent:SetRenderMode( data.RenderMode or RENDERMODE_NORMAL )
 	ent:SetColor( data.Color or Color(255, 255, 255, 255) )
