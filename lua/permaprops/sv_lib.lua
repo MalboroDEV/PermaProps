@@ -39,7 +39,7 @@ function PermaProps.PPGetEntTable( ent )
 	end
 
 	do
-		local othercontent = hook.Run("PermaProps.AddData", ent)
+		local othercontent = hook.Run("PermaProps.OnEntitySaved", ent)
 		if othercontent and istable(othercontent) then
 			table.Merge(content, othercontent)
 		end
@@ -128,7 +128,7 @@ function PermaProps.PPEntityFromTable( data, id )
 
 	end
 
-	hook.Run("PermaProps.ApplyData", ent, data)
+	hook.Run("PermaProps.OnEntityCreated", ent, data)
 
 	ent:SetRenderMode( data.RenderMode or RENDERMODE_NORMAL )
 	ent:SetColor( data.Color or Color(255, 255, 255, 255) )
