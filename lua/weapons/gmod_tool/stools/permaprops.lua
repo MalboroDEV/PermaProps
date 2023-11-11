@@ -43,6 +43,9 @@ function TOOL:LeftClick(trace)
 	if ent:IsPlayer() then ply:ChatPrint( "That is a player !" ) return end
 	if ent.PermaProps then ply:ChatPrint( "That entity is already permanent !" ) return end
 
+	local canPermaProp = hook.Run("PermaProps.CanPermaProp", ply, ent, self)
+	if canPermaProp ~= nil and canPermaProp == false then return end
+
 	local content = PermaProps.PPGetEntTable(ent)
 	if not content then return end
 
